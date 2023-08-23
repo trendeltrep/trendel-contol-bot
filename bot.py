@@ -1,11 +1,10 @@
 import logging
+import os
+import subprocess
+from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.middlewares.logging import LoggingMiddleware
 from aiogram.utils import executor
-import os
-import subprocess
-
-from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
@@ -21,11 +20,12 @@ bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
 
-def check(id: int) -> bool:
-    result: bool = False
-    if id != int(os.getenv("ADMIN")):
-        return result
-    return not result
+def is_admin(user_id: int) -> bool:
+    return user_id == int(os.getenv("ADMIN"))
+
+
+def send_unauthorized_message(message: types.Message):
+    return f"You are not authorized to use this bot, your id is: {message.from_user.id}"
 
 
 # Register a command handler
@@ -34,26 +34,37 @@ async def cmd_start(message: types.Message):
     await message.answer("Hello! I'm your bot. Send me a message!")
 
 
-@dp.message_handler(commands=["steam"])
+# Register a command handler to start Steam
+@dp.message_handler(commands=["steam_start"])
 async def steam_start(message: types.Message):
-    if check(message.from_user.id) == False:
-        await message.answer(
-            f"You are not available to use this bot, your id is: {message.from_user.id}"
-        )
-    else:
+    if is_admin(message.from_user.id):
         steam_exe = r"D:\steam\Steam.exe"  # Adjust the path to your Steam executable
+        await message.answer("Opening...")
         subprocess.Popen([steam_exe])
+        await message.answer("Done")
+
+    else:
+        send_unauthorized_message(message)
+
+
+# Register a command handler to close Steam
+@dp.message_handler(commands=["steam_close"])
+async def steam_close(message: types.Message):
+    if is_admin(message.from_user.id):
+        await message.answer("Closing...")
+        subprocess.run(["taskkill", "/F", "/IM", "steam.exe"])
+        await message.answer("Done")
+    else:
+        send_unauthorized_message(message)
 
 
 # Register a text message handler
 @dp.message_handler(content_types=types.ContentTypes.TEXT)
 async def echo_message(message: types.Message):
-    if check(message.from_user.id) == False:
-        await message.answer(
-            f"You are not available to use this bot, your id is: {message.from_user.id}"
-        )
+    if is_admin(message.from_user.id):
+        await message.answer(f"You said: {message.text}")
     else:
-        await message.answer(f"You said: {message.from_user.id}")
+        send_unauthorized_message(message)
 
 
 if __name__ == "__main__":

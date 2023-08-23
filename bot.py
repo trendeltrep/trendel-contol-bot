@@ -1,6 +1,7 @@
 import logging
 import os
 import subprocess
+import pyautogui
 from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.middlewares.logging import LoggingMiddleware
@@ -54,6 +55,19 @@ async def steam_close(message: types.Message):
         await message.answer("Closing...")
         subprocess.run(["taskkill", "/F", "/IM", "steam.exe"])
         await message.answer("Done")
+    else:
+        send_unauthorized_message(message)
+
+
+# Register a command handler to take a screenshot and send it
+@dp.message_handler(commands=["screen"])
+async def take_screenshot(message: types.Message):
+    if is_admin(message.from_user.id):
+        screenshot_path = "screenshot.png"
+        pyautogui.screenshot(screenshot_path)
+        with open(screenshot_path, "rb") as screenshot_file:
+            await bot.send_photo(message.chat.id, screenshot_file)
+        os.remove(screenshot_path)  # Remove the temporary screenshot file
     else:
         send_unauthorized_message(message)
 

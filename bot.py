@@ -79,13 +79,12 @@ async def take_screenshot(message: types.Message):
         send_unauthorized_message(message)
 
 
-# Opening a browser for searching information
+# Register a command handler to open a browser for searching information
 @dp.message_handler(commands=["chrome"])
 async def chrome_open(message: types.Message):
     if is_admin(message.from_user.id):
         query = " ".join(message.text.split()[1:])  # Extract the search query
         search_url = f"https://www.google.com/search?q={query}"
-
         # Open Google Chrome with the search URL
         subprocess.Popen(
             ["chrome", search_url]
@@ -96,7 +95,7 @@ async def chrome_open(message: types.Message):
         send_unauthorized_message(message)
 
 
-# Closing browser
+# Register a command handler to close browser
 @dp.message_handler(commands=["chrome_close"])
 def chrome_close():
     if platform.system() == "Windows":
@@ -107,6 +106,19 @@ def chrome_close():
         subprocess.run(["pkill", "chrome"])
     else:
         print("Unsupported operating system")
+
+
+# Register a command handler to click at exact place
+@dp.message_handler(commands=["click"])
+async def click(message: types.Message):
+    if is_admin(message.from_user.id):
+        [x, y] = message.text.split()[1:]  # Intialize coords
+        # Move the mouse to the click position (optional)
+        pyautogui.moveTo(x, y)
+        # Perform the mouse click
+        pyautogui.click(x, y)
+    else:
+        send_unauthorized_message(message)
 
 
 # Register a text message handler

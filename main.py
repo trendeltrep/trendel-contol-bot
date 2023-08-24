@@ -1,7 +1,6 @@
 import logging, os, platform, subprocess, pyautogui, time
 from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, types
-from aiogram.contrib.middlewares.logging import LoggingMiddleware
 from aiogram.utils import executor
 from PIL import Image, ImageDraw, ImageFont
 

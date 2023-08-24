@@ -142,6 +142,7 @@ async def click(message: types.Message):
         send_unauthorized_message(message)
 
 
+# Register a command handler to scrolling
 @dp.message_handler(commands=["scroll"])
 async def scroll_page(message: types.Message):
     """Scroll a specified number of times command handler."""
@@ -174,6 +175,26 @@ async def scroll_page(message: types.Message):
 
     except (IndexError, ValueError):
         await message.answer("Invalid command format. Use /scroll <value>")
+
+
+# Register a command handler to power off the computer
+@dp.message_handler(commands=["power_off"])
+async def power_off(message: types.Message):
+    if not is_admin(message.from_user.id):
+        await send_unauthorized_message(message)
+        return
+    system = platform.system()
+    try:
+        if system == "Windows":
+            subprocess.run(["shutdown", "/s", "/f", "/t", "0"], check=True)
+        elif system == "Linux":
+            subprocess.run(["shutdown", "-h", "now"], check=True)
+        elif system == "Darwin":
+            subprocess.run(["sudo", "shutdown", "-h", "now"], check=True)
+        else:
+            print("Unsupported operating system")
+    except subprocess.CalledProcessError as e:
+        print(f"Error powering off: {e}")
 
 
 # Register a text message handler

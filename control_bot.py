@@ -16,6 +16,7 @@ API_TOKEN = os.getenv("API_TOKEN")
 PATH_TO_STEAM = os.getenv("PATH_TO_STEAM")
 PATH_TO_CHROME = os.getenv("PATH_TO_CHROME")
 ADMIN_ID = int(os.getenv("ADMIN_ID"))
+BOT_PAUSED = False
 
 # Initialize bot and dispatcher
 bot = Bot(token=API_TOKEN)
@@ -41,6 +42,9 @@ async def cmd_start(message: types.Message):
     if not is_admin(message.from_user.id):
         await send_unauthorized_message(message)
         return
+    if BOT_PAUSED:
+        await message.answer("Bot is currently paused")
+        return
     await message.answer("Hello! I'm your bot. Send me a message!")
 
 
@@ -49,6 +53,9 @@ async def steam_start(message: types.Message):
     """Start Steam command handler."""
     if not is_admin(message.from_user.id):
         await send_unauthorized_message(message)
+        return
+    if BOT_PAUSED:
+        await message.answer("Bot is currently paused")
         return
     try:
         await message.answer("Opening...")
@@ -63,6 +70,9 @@ async def steam_close(message: types.Message):
     """Close Steam command handler."""
     if not is_admin(message.from_user.id):
         await send_unauthorized_message(message)
+        return
+    if BOT_PAUSED:
+        await message.answer("Bot is currently paused")
         return
     if platform.system() == "Windows":
         subprocess.run(["taskkill", "/F", "/IM", "steam.exe"])
@@ -80,6 +90,9 @@ async def take_screenshot(message: types.Message):
     if not is_admin(message.from_user.id):
         await send_unauthorized_message(message)
         return
+    if BOT_PAUSED:
+        await message.answer("Bot is currently paused")
+        return
     try:
         screenshot_path = "screenshot.png"
         pyautogui.screenshot(screenshot_path)
@@ -96,6 +109,9 @@ async def take_screenshot_framed(message: types.Message):
     if not is_admin(message.from_user.id):
         await send_unauthorized_message(message)
         return
+    if BOT_PAUSED:
+        await message.answer("Bot is currently paused")
+        return
     try:
         screenshot_path = "screenshot.png"
         pyautogui.screenshot(screenshot_path)
@@ -104,7 +120,15 @@ async def take_screenshot_framed(message: types.Message):
         draw = ImageDraw.Draw(image)
         font = ImageFont.load_default()
 
-        grid_size = 5
+        split_result = message.text.split()
+        if len(split_result) == 1:
+            grid_size = 5  # Default grid size
+        elif len(split_result) >= 2:
+            try:
+                num = int(split_result[1])
+            except ValueError:
+                logging.info("num - not a number")
+            grid_size = num if num > 0 else 5
         width, height = image.size
 
         # Draw vertical lines and add numbers to the corners
@@ -132,6 +156,9 @@ async def chrome_open(message: types.Message):
         await send_unauthorized_message(message)
         return
 
+    if BOT_PAUSED:
+        await message.answer("Bot is currently paused")
+        return
     query = " ".join(message.text.split()[1:])  # Extract the search query
     search_url = f"https://www.google.com/search?q={query}"
     # Open Google Chrome with the search URL
@@ -177,6 +204,9 @@ async def close(message: types.Message):
     if not is_admin(message.from_user.id):
         await send_unauthorized_message(message)
         return
+    if BOT_PAUSED:
+        await message.answer("Bot is currently paused")
+        return
     apps = message.text.split()[1:]
     for app in apps:
         if platform.system() == "Windows":
@@ -198,6 +228,9 @@ async def chrome_close(message: types.Message):
     if not is_admin(message.from_user.id):
         await send_unauthorized_message(message)
         return
+    if BOT_PAUSED:
+        await message.answer("Bot is currently paused")
+        return
     if platform.system() == "Windows":
         subprocess.run(["taskkill", "/F", "/IM", "chrome.exe"])
     elif platform.system() == "Darwin":
@@ -215,6 +248,9 @@ async def click(message: types.Message):
         await send_unauthorized_message(message)
         return
 
+    if BOT_PAUSED:
+        await message.answer("Bot is currently paused")
+        return
     coords = message.text.split()[1:]  # Extract coordinates
     if len(coords) == 2:
         try:
@@ -234,6 +270,9 @@ async def double_click(message: types.Message):
     if not is_admin(message.from_user.id):
         await send_unauthorized_message(message)
         return
+    if BOT_PAUSED:
+        await message.answer("Bot is currently paused")
+        return
     pyautogui.doubleClick()
 
 
@@ -244,6 +283,9 @@ async def move_to(message: types.Message):
         await send_unauthorized_message(message)
         return
 
+    if BOT_PAUSED:
+        await message.answer("Bot is currently paused")
+        return
     coords = message.text.split()[1:]  # Extract coordinates
     if len(coords) == 2:
         try:
@@ -264,6 +306,9 @@ async def scroll_page(message: types.Message):
         await send_unauthorized_message(message)
         return
 
+    if BOT_PAUSED:
+        await message.answer("Bot is currently paused")
+        return
     try:
         scroll_value = int(message.text.split()[1])
         screen_height = pyautogui.size().height
@@ -297,6 +342,9 @@ async def power_off(message: types.Message):
     if not is_admin(message.from_user.id):
         await send_unauthorized_message(message)
         return
+    if BOT_PAUSED:
+        await message.answer("Bot is currently paused")
+        return
     system = platform.system()
     try:
         if system == "Windows":
@@ -311,6 +359,24 @@ async def power_off(message: types.Message):
         print(f"Error powering off: {e}")
 
 
+@dp.message_handler(commands=["enable_bot"])
+async def enable_bot(message: types.Message):
+    if not is_admin(message.from_user.id):
+        await send_unauthorized_message(message)
+        return
+    global BOT_PAUSED
+    BOT_PAUSED = False
+
+
+@dp.message_handler(commands=["disable_bot"])
+async def disable_bot(message: types.Message):
+    if not is_admin(message.from_user.id):
+        await send_unauthorized_message(message)
+        return
+    global BOT_PAUSED
+    BOT_PAUSED = True
+
+
 # Register a text message handler
 @dp.message_handler(content_types=types.ContentTypes.TEXT)
 async def test(message: types.Message):
@@ -323,5 +389,8 @@ async def test(message: types.Message):
 
 
 if __name__ == "__main__":
+    # Initialize a flag to track whether the bot is paused or not
+    BOT_PAUSED = False
+
     # Start the bot
     executor.start_polling(dp, skip_updates=True)

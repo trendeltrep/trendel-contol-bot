@@ -39,7 +39,7 @@ async def send_unauthorized_message(message: types.Message):
 async def cmd_start(message: types.Message):
     """Start command handler."""
     if not is_admin(message.from_user.id):
-        send_unauthorized_message(message)
+        await send_unauthorized_message(message)
         return
     await message.answer("Hello! I'm your bot. Send me a message!")
 
@@ -47,53 +47,89 @@ async def cmd_start(message: types.Message):
 @dp.message_handler(commands=["steam_start"])
 async def steam_start(message: types.Message):
     """Start Steam command handler."""
-    if is_admin(message.from_user.id):
-        try:
-            await message.answer("Opening...")
-            subprocess.Popen([PATH_TO_STEAM])
-            await message.answer("Done")
-        except Exception as e:
-            await message.answer(f"Error opening Steam: {e}")
-    else:
+    if not is_admin(message.from_user.id):
         await send_unauthorized_message(message)
+        return
+    try:
+        await message.answer("Opening...")
+        subprocess.Popen([PATH_TO_STEAM])
+        await message.answer("Done")
+    except Exception as e:
+        await message.answer(f"Error opening Steam: {e}")
 
 
 @dp.message_handler(commands=["steam_close"])
 async def steam_close(message: types.Message):
     """Close Steam command handler."""
-    if is_admin(message.from_user.id):
-        if platform.system() == "Windows":
-            subprocess.run(["taskkill", "/F", "/IM", "steam.exe"])
-        elif platform.system() == "Darwin":
-            subprocess.run(["pkill", "-x", "Steam"])
-        elif platform.system() == "Linux":
-            subprocess.run(["pkill", "steam"])
-        else:
-            print("Unsupported operating system")
-    else:
+    if not is_admin(message.from_user.id):
         await send_unauthorized_message(message)
+        return
+    if platform.system() == "Windows":
+        subprocess.run(["taskkill", "/F", "/IM", "steam.exe"])
+    elif platform.system() == "Darwin":
+        subprocess.run(["pkill", "-x", "Steam"])
+    elif platform.system() == "Linux":
+        subprocess.run(["pkill", "steam"])
+    else:
+        print("Unsupported operating system")
 
 
 @dp.message_handler(commands=["screen"])
 async def take_screenshot(message: types.Message):
     """Take a screenshot and send it command handler."""
-    if is_admin(message.from_user.id):
-        try:
-            screenshot_path = "screenshot.png"
-            pyautogui.screenshot(screenshot_path)
-            with open(screenshot_path, "rb") as screenshot_file:
-                await bot.send_photo(message.chat.id, screenshot_file)
-            os.remove(screenshot_path)  # Remove the temporary screenshot file
-        except Exception as e:
-            await message.answer(f"Error taking screenshot: {e}")
-    else:
+    if not is_admin(message.from_user.id):
         await send_unauthorized_message(message)
+        return
+    try:
+        screenshot_path = "screenshot.png"
+        pyautogui.screenshot(screenshot_path)
+        with open(screenshot_path, "rb") as screenshot_file:
+            await bot.send_photo(message.chat.id, screenshot_file)
+        os.remove(screenshot_path)  # Remove the temporary screenshot file
+    except Exception as e:
+        await message.answer(f"Error taking screenshot: {e}")
+
+
+@dp.message_handler(commands=["screen_framed"])
+async def take_screenshot_framed(message: types.Message):
+    """Take a screenshot and send it command handler."""
+    if not is_admin(message.from_user.id):
+        await send_unauthorized_message(message)
+        return
+    try:
+        screenshot_path = "screenshot.png"
+        pyautogui.screenshot(screenshot_path)
+
+        image = Image.open(screenshot_path)
+        draw = ImageDraw.Draw(image)
+        font = ImageFont.load_default()
+
+        grid_size = 5
+        width, height = image.size
+
+        # Draw vertical lines and add numbers to the corners
+        for x in range(0, width, width // grid_size):
+            draw.line([(x, 0), (x, height)], fill=(255, 0, 0))
+            draw.text((x, 0), str(x), fill=(255, 0, 0), font=font)
+
+        # Draw horizontal lines and add numbers to the corners
+        for y in range(0, height, height // grid_size):
+            draw.line([(0, y), (width, y)], fill=(255, 0, 0))
+            draw.text((0, y), str(y), fill=(255, 0, 0), font=font)
+
+        image.save(screenshot_path)
+
+        with open(screenshot_path, "rb") as screenshot_file:
+            await bot.send_photo(message.chat.id, screenshot_file)
+        os.remove(screenshot_path)
+    except Exception as e:
+        await message.answer(f"Error taking screenshot: {e}")
 
 
 @dp.message_handler(commands=["chrome"])
 async def chrome_open(message: types.Message):
     if not is_admin(message.from_user.id):
-        send_unauthorized_message(message)
+        await send_unauthorized_message(message)
         return
 
     query = " ".join(message.text.split()[1:])  # Extract the search query
@@ -136,27 +172,47 @@ async def chrome_open(message: types.Message):
         await message.answer(f"Error taking screenshot: {e}")
 
 
+@dp.message_handler(commands=["close"])
+async def close(message: types.Message):
+    if not is_admin(message.from_user.id):
+        await send_unauthorized_message(message)
+        return
+    apps = message.text.split()[1:]
+    for app in apps:
+        if platform.system() == "Windows":
+            subprocess.run(["taskkill", "/F", "/IM", f"{app}.exe"])
+            message.answer(f"Closed {app}")
+        elif platform.system() == "Darwin":
+            subprocess.run(["pkill", "-x", f"{app}"])
+            message.answer(f"Closed {app}")
+        elif platform.system() == "Linux":
+            subprocess.run(["pkill", f"{app}"])
+            message.answer(f"Closed {app}")
+        else:
+            print("Unsupported operating system")
+
+
 # Register a command handler to close browser
 @dp.message_handler(commands=["chrome_close"])
 async def chrome_close(message: types.Message):
-    if is_admin(message.from_user.id):
-        if platform.system() == "Windows":
-            subprocess.run(["taskkill", "/F", "/IM", "chrome.exe"])
-        elif platform.system() == "Darwin":
-            subprocess.run(["pkill", "-x", "Google Chrome"])
-        elif platform.system() == "Linux":
-            subprocess.run(["pkill", "chrome"])
-        else:
-            print("Unsupported operating system")
+    if not is_admin(message.from_user.id):
+        await send_unauthorized_message(message)
+        return
+    if platform.system() == "Windows":
+        subprocess.run(["taskkill", "/F", "/IM", "chrome.exe"])
+    elif platform.system() == "Darwin":
+        subprocess.run(["pkill", "-x", "Google Chrome"])
+    elif platform.system() == "Linux":
+        subprocess.run(["pkill", "chrome"])
     else:
-        send_unauthorized_message(message)
+        print("Unsupported operating system")
 
 
 # Register a command handler to click at exact place
 @dp.message_handler(commands=["click"])
 async def click(message: types.Message):
     if not is_admin(message.from_user.id):
-        send_unauthorized_message(message)
+        await send_unauthorized_message(message)
         return
 
     coords = message.text.split()[1:]  # Extract coordinates
@@ -171,6 +227,33 @@ async def click(message: types.Message):
             await message.answer("Invalid coordinates. Use /click x y")
     else:
         await message.answer("Invalid number of coordinates. Use /click x y")
+
+
+@dp.message_handler(commands=["double_click"])
+async def double_click(message: types.Message):
+    if not is_admin(message.from_user.id):
+        await send_unauthorized_message(message)
+        return
+    pyautogui.doubleClick()
+
+
+# Register a command handler to click at exact place
+@dp.message_handler(commands=["move_to"])
+async def move_to(message: types.Message):
+    if not is_admin(message.from_user.id):
+        await send_unauthorized_message(message)
+        return
+
+    coords = message.text.split()[1:]  # Extract coordinates
+    if len(coords) == 2:
+        try:
+            x, y = map(int, coords)  # Convert coordinates to integers
+            # Move the mouse to the click position (optional)
+            pyautogui.moveTo(x, y)
+        except ValueError:
+            await message.answer("Invalid coordinates.")
+    else:
+        await message.answer("Invalid number of coordinates.")
 
 
 # Register a command handler to scrolling
@@ -231,12 +314,12 @@ async def power_off(message: types.Message):
 # Register a text message handler
 @dp.message_handler(content_types=types.ContentTypes.TEXT)
 async def test(message: types.Message):
-    if is_admin(message.from_user.id):
-        words = message.text.split()[1:]  # Skip the command itself
-        for word in words:
-            await message.answer(word)
-    else:
-        send_unauthorized_message(message)
+    if not is_admin(message.from_user.id):
+        await send_unauthorized_message(message)
+        return
+    words = message.text.split()[1:]  # Skip the command itself
+    for word in words:
+        await message.answer(word)
 
 
 if __name__ == "__main__":

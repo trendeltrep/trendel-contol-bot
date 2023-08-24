@@ -38,6 +38,9 @@ async def send_unauthorized_message(message: types.Message):
 @dp.message_handler(commands=["start"])
 async def cmd_start(message: types.Message):
     """Start command handler."""
+    if not is_admin(message.from_user.id):
+        send_unauthorized_message(message)
+        return
     await message.answer("Hello! I'm your bot. Send me a message!")
 
 
@@ -89,47 +92,48 @@ async def take_screenshot(message: types.Message):
 
 @dp.message_handler(commands=["chrome"])
 async def chrome_open(message: types.Message):
-    if is_admin(message.from_user.id):
-        query = " ".join(message.text.split()[1:])  # Extract the search query
-        search_url = f"https://www.google.com/search?q={query}"
-        # Open Google Chrome with the search URL
-        subprocess.Popen(
-            [PATH_TO_CHROME, "--incognito", search_url]
-        )  # Adjust this command based on your system
-
-        await message.answer(f"Searching for '{query}' in Google Chrome...")
-        time.sleep(2)  # Delay to allow Chrome to load
-
-        try:
-            screenshot_path = "screenshot.png"
-            pyautogui.screenshot(screenshot_path)
-
-            image = Image.open(screenshot_path)
-            draw = ImageDraw.Draw(image)
-            font = ImageFont.load_default()
-
-            grid_size = 5
-            width, height = image.size
-
-            # Draw vertical lines and add numbers to the corners
-            for x in range(0, width, width // grid_size):
-                draw.line([(x, 0), (x, height)], fill=(255, 0, 0))
-                draw.text((x, 0), str(x), fill=(255, 0, 0), font=font)
-
-            # Draw horizontal lines and add numbers to the corners
-            for y in range(0, height, height // grid_size):
-                draw.line([(0, y), (width, y)], fill=(255, 0, 0))
-                draw.text((0, y), str(y), fill=(255, 0, 0), font=font)
-
-            image.save(screenshot_path)
-
-            with open(screenshot_path, "rb") as screenshot_file:
-                await bot.send_photo(message.chat.id, screenshot_file)
-            os.remove(screenshot_path)
-        except Exception as e:
-            await message.answer(f"Error taking screenshot: {e}")
-    else:
+    if not is_admin(message.from_user.id):
         send_unauthorized_message(message)
+        return
+
+    query = " ".join(message.text.split()[1:])  # Extract the search query
+    search_url = f"https://www.google.com/search?q={query}"
+    # Open Google Chrome with the search URL
+    subprocess.Popen(
+        [PATH_TO_CHROME, "--incognito", search_url]
+    )  # Adjust this command based on your system
+
+    await message.answer(f"Searching for '{query}' in Google Chrome...")
+    time.sleep(2)  # Delay to allow Chrome to load
+
+    try:
+        screenshot_path = "screenshot.png"
+        pyautogui.screenshot(screenshot_path)
+
+        image = Image.open(screenshot_path)
+        draw = ImageDraw.Draw(image)
+        font = ImageFont.load_default()
+
+        grid_size = 5
+        width, height = image.size
+
+        # Draw vertical lines and add numbers to the corners
+        for x in range(0, width, width // grid_size):
+            draw.line([(x, 0), (x, height)], fill=(255, 0, 0))
+            draw.text((x, 0), str(x), fill=(255, 0, 0), font=font)
+
+        # Draw horizontal lines and add numbers to the corners
+        for y in range(0, height, height // grid_size):
+            draw.line([(0, y), (width, y)], fill=(255, 0, 0))
+            draw.text((0, y), str(y), fill=(255, 0, 0), font=font)
+
+        image.save(screenshot_path)
+
+        with open(screenshot_path, "rb") as screenshot_file:
+            await bot.send_photo(message.chat.id, screenshot_file)
+        os.remove(screenshot_path)
+    except Exception as e:
+        await message.answer(f"Error taking screenshot: {e}")
 
 
 # Register a command handler to close browser
@@ -151,21 +155,22 @@ async def chrome_close(message: types.Message):
 # Register a command handler to click at exact place
 @dp.message_handler(commands=["click"])
 async def click(message: types.Message):
-    if is_admin(message.from_user.id):
-        coords = message.text.split()[1:]  # Extract coordinates
-        if len(coords) == 2:
-            try:
-                x, y = map(int, coords)  # Convert coordinates to integers
-                # Move the mouse to the click position (optional)
-                pyautogui.moveTo(x, y)
-                # Perform the mouse click
-                pyautogui.click(x, y)
-            except ValueError:
-                await message.answer("Invalid coordinates. Use /click x y")
-        else:
-            await message.answer("Invalid number of coordinates. Use /click x y")
-    else:
+    if not is_admin(message.from_user.id):
         send_unauthorized_message(message)
+        return
+
+    coords = message.text.split()[1:]  # Extract coordinates
+    if len(coords) == 2:
+        try:
+            x, y = map(int, coords)  # Convert coordinates to integers
+            # Move the mouse to the click position (optional)
+            pyautogui.moveTo(x, y)
+            # Perform the mouse click
+            pyautogui.click(x, y)
+        except ValueError:
+            await message.answer("Invalid coordinates. Use /click x y")
+    else:
+        await message.answer("Invalid number of coordinates. Use /click x y")
 
 
 # Register a command handler to scrolling

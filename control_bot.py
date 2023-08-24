@@ -336,6 +336,29 @@ async def scroll_page(message: types.Message):
         await message.answer("Invalid command format. Use /scroll <value>")
 
 
+# Register a command handler to reboot the computer
+@dp.message_handler(commands=["reboot"])
+async def reboot(message: types.Message):
+    if not is_admin(message.from_user.id):
+        await send_unauthorized_message(message)
+        return
+    if BOT_PAUSED:
+        await message.answer("Bot is currently paused")
+        return
+    system = platform.system()
+    try:
+        if system == "Windows":
+            subprocess.run(["shutdown", "/r", "/f", "/t", "0"], check=True)
+        elif system == "Linux":
+            subprocess.run(["reboot"], check=True)
+        elif system == "Darwin":
+            subprocess.run(["sudo", "reboot"], check=True)
+        else:
+            print("Unsupported operating system")
+    except subprocess.CalledProcessError as e:
+        print(f"Error rebooting: {e}")
+
+
 # Register a command handler to power off the computer
 @dp.message_handler(commands=["power_off"])
 async def power_off(message: types.Message):

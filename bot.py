@@ -1,12 +1,10 @@
-import logging
-import os
-import platform
-import subprocess
-import pyautogui
+import logging, os, platform, subprocess, pyautogui, time
 from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.middlewares.logging import LoggingMiddleware
 from aiogram.utils import executor
+from PIL import Image, ImageDraw, ImageFont
+
 
 # Load environment variables from .env file
 load_dotenv()
@@ -90,7 +88,6 @@ async def take_screenshot(message: types.Message):
         await send_unauthorized_message(message)
 
 
-# Register a command handler to open a browser for searching information
 @dp.message_handler(commands=["chrome"])
 async def chrome_open(message: types.Message):
     if is_admin(message.from_user.id):
@@ -102,6 +99,36 @@ async def chrome_open(message: types.Message):
         )  # Adjust this command based on your system
 
         await message.answer(f"Searching for '{query}' in Google Chrome...")
+        time.sleep(2)  # Delay to allow Chrome to load
+
+        try:
+            screenshot_path = "screenshot.png"
+            pyautogui.screenshot(screenshot_path)
+
+            image = Image.open(screenshot_path)
+            draw = ImageDraw.Draw(image)
+            font = ImageFont.load_default()
+
+            grid_size = 5
+            width, height = image.size
+
+            # Draw vertical lines and add numbers to the corners
+            for x in range(0, width, width // grid_size):
+                draw.line([(x, 0), (x, height)], fill=(255, 0, 0))
+                draw.text((x, 0), str(x), fill=(255, 0, 0), font=font)
+
+            # Draw horizontal lines and add numbers to the corners
+            for y in range(0, height, height // grid_size):
+                draw.line([(0, y), (width, y)], fill=(255, 0, 0))
+                draw.text((0, y), str(y), fill=(255, 0, 0), font=font)
+
+            image.save(screenshot_path)
+
+            with open(screenshot_path, "rb") as screenshot_file:
+                await bot.send_photo(message.chat.id, screenshot_file)
+            os.remove(screenshot_path)
+        except Exception as e:
+            await message.answer(f"Error taking screenshot: {e}")
     else:
         send_unauthorized_message(message)
 

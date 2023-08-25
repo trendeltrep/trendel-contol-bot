@@ -33,7 +33,7 @@ dp = Dispatcher(bot)
 commands = """
 /start - Starting bot
 /enable_bot - Enable bot
-/disable_bot - Disable bot
+/pause_bot - Pause bot
 /steam_start - Open steam
 /steam_close - Close steam
 /spotify_start - Open spotify
@@ -78,8 +78,9 @@ async def cmd_start(message: types.Message):
 
 
 # Command handlers
-@dp.message_handler(commands=["commands"])
-async def commands(message: types.Message):
+# /help
+@dp.message_handler(commands=["help"])
+async def help(message: types.Message):
     """Start command handler."""
     if not is_admin(message.from_user.id):
         await send_unauthorized_message(message)
@@ -490,9 +491,9 @@ async def enable_bot(message: types.Message):
     BOT_PAUSED = False
 
 
-# /disable_bot
-@dp.message_handler(commands=["disable_bot"])
-async def disable_bot(message: types.Message):
+# /pause_bot
+@dp.message_handler(commands=["pause_bot"])
+async def pause_bot(message: types.Message):
     if not is_admin(message.from_user.id):
         await send_unauthorized_message(message)
         return

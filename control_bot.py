@@ -1,21 +1,21 @@
+import json
 import logging, os, platform, subprocess, pyautogui, time
-from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, types
 from aiogram.utils import executor
 from PIL import Image, ImageDraw, ImageFont
 
 
-# Load environment variables from .env file
-load_dotenv()
-
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 
-# Load configuration from environment variables
-API_TOKEN = os.getenv("API_TOKEN")
-PATH_TO_STEAM = os.getenv("PATH_TO_STEAM")
-PATH_TO_CHROME = os.getenv("PATH_TO_CHROME")
-ADMIN_ID = int(os.getenv("ADMIN_ID"))
+# Load configuration from JSON file
+with open("config.json", "r") as config_file:
+    config = json.load(config_file)
+# Load configuration from config
+API_TOKEN = config["API_TOKEN"]
+PATH_TO_STEAM = config["PATH_TO_STEAM"]
+PATH_TO_CHROME = config["PATH_TO_CHROME"]
+ADMIN_ID = config["ADMIN_ID"]
 BOT_PAUSED = False
 
 # Initialize bot and dispatcher

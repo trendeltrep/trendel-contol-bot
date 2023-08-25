@@ -48,6 +48,7 @@ async def cmd_start(message: types.Message):
     await message.answer("Hello! I'm your bot. Send me a message!")
 
 
+# /steam_start
 @dp.message_handler(commands=["steam_start"])
 async def steam_start(message: types.Message):
     """Start Steam command handler."""
@@ -65,6 +66,7 @@ async def steam_start(message: types.Message):
         await message.answer(f"Error opening Steam: {e}")
 
 
+# /steam_close
 @dp.message_handler(commands=["steam_close"])
 async def steam_close(message: types.Message):
     """Close Steam command handler."""
@@ -84,6 +86,7 @@ async def steam_close(message: types.Message):
         print("Unsupported operating system")
 
 
+# /screen
 @dp.message_handler(commands=["screen"])
 async def take_screenshot(message: types.Message):
     """Take a screenshot and send it command handler."""
@@ -103,6 +106,7 @@ async def take_screenshot(message: types.Message):
         await message.answer(f"Error taking screenshot: {e}")
 
 
+# /screen_framed | /screen_framed *num*
 @dp.message_handler(commands=["screen_framed"])
 async def take_screenshot_framed(message: types.Message):
     """Take a screenshot and send it command handler."""
@@ -150,6 +154,7 @@ async def take_screenshot_framed(message: types.Message):
         await message.answer(f"Error taking screenshot: {e}")
 
 
+# /chrome *input*
 @dp.message_handler(commands=["chrome"])
 async def chrome_open(message: types.Message):
     if not is_admin(message.from_user.id):
@@ -199,6 +204,7 @@ async def chrome_open(message: types.Message):
         await message.answer(f"Error taking screenshot: {e}")
 
 
+# /close *any apps in lowercase*
 @dp.message_handler(commands=["close"])
 async def close(message: types.Message):
     if not is_admin(message.from_user.id):
@@ -223,6 +229,7 @@ async def close(message: types.Message):
 
 
 # Register a command handler to close browser
+# /chrome_close
 @dp.message_handler(commands=["chrome_close"])
 async def chrome_close(message: types.Message):
     if not is_admin(message.from_user.id):
@@ -242,6 +249,7 @@ async def chrome_close(message: types.Message):
 
 
 # Register a command handler to click at exact place
+# /click | /click x y
 @dp.message_handler(commands=["click"])
 async def click(message: types.Message):
     if not is_admin(message.from_user.id):
@@ -251,6 +259,7 @@ async def click(message: types.Message):
     if BOT_PAUSED:
         await message.answer("Bot is currently paused")
         return
+
     coords = message.text.split()[1:]  # Extract coordinates
     if len(coords) == 2:
         try:
@@ -261,10 +270,15 @@ async def click(message: types.Message):
             pyautogui.click(x, y)
         except ValueError:
             await message.answer("Invalid coordinates. Use /click x y")
+    elif len(coords) == 0:  # No coordinates provided, click at current mouse position
+        x, y = pyautogui.position()
+        # Perform the mouse click
+        pyautogui.click(x, y)
     else:
         await message.answer("Invalid number of coordinates. Use /click x y")
 
 
+# /double_click
 @dp.message_handler(commands=["double_click"])
 async def double_click(message: types.Message):
     if not is_admin(message.from_user.id):
@@ -277,6 +291,7 @@ async def double_click(message: types.Message):
 
 
 # Register a command handler to click at exact place
+# /move_to x y
 @dp.message_handler(commands=["move_to"])
 async def move_to(message: types.Message):
     if not is_admin(message.from_user.id):
@@ -299,6 +314,7 @@ async def move_to(message: types.Message):
 
 
 # Register a command handler to scrolling
+# /scroll *num*
 @dp.message_handler(commands=["scroll"])
 async def scroll_page(message: types.Message):
     """Scroll a specified number of times command handler."""
@@ -337,6 +353,7 @@ async def scroll_page(message: types.Message):
 
 
 # Register a command handler to reboot the computer
+# /reboot
 @dp.message_handler(commands=["reboot"])
 async def reboot(message: types.Message):
     if not is_admin(message.from_user.id):
@@ -360,6 +377,7 @@ async def reboot(message: types.Message):
 
 
 # Register a command handler to power off the computer
+# /power_off
 @dp.message_handler(commands=["power_off"])
 async def power_off(message: types.Message):
     if not is_admin(message.from_user.id):
@@ -382,6 +400,7 @@ async def power_off(message: types.Message):
         print(f"Error powering off: {e}")
 
 
+# /enable_bot
 @dp.message_handler(commands=["enable_bot"])
 async def enable_bot(message: types.Message):
     if not is_admin(message.from_user.id):
@@ -391,6 +410,7 @@ async def enable_bot(message: types.Message):
     BOT_PAUSED = False
 
 
+# /disable_bot
 @dp.message_handler(commands=["disable_bot"])
 async def disable_bot(message: types.Message):
     if not is_admin(message.from_user.id):

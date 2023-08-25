@@ -17,6 +17,7 @@ with open(config_path, "r") as config_file:
 API_TOKEN = config["API_TOKEN"]
 PATH_TO_STEAM = config["PATH_TO_STEAM"]
 PATH_TO_CHROME = config["PATH_TO_CHROME"]
+PATH_TO_SPOTIFY = config["PATH_TO_SPOTIFY"]
 ADMIN_ID = config["ADMIN_ID"]
 BOT_PAUSED = False
 
@@ -84,6 +85,44 @@ async def steam_close(message: types.Message):
         subprocess.run(["pkill", "-x", "Steam"])
     elif platform.system() == "Linux":
         subprocess.run(["pkill", "steam"])
+    else:
+        print("Unsupported operating system")
+
+
+# /spotify_start
+@dp.message_handler(commands=["spotify_start"])
+async def steam_start(message: types.Message):
+    """Start Steam command handler."""
+    if not is_admin(message.from_user.id):
+        await send_unauthorized_message(message)
+        return
+    if BOT_PAUSED:
+        await message.answer("Bot is currently paused")
+        return
+    try:
+        await message.answer("Opening...")
+        subprocess.Popen([PATH_TO_SPOTIFY])
+        await message.answer("Done")
+    except Exception as e:
+        await message.answer(f"Error opening Steam: {e}")
+
+
+# /spotify_close
+@dp.message_handler(commands=["spotify_close"])
+async def steam_close(message: types.Message):
+    """Close Steam command handler."""
+    if not is_admin(message.from_user.id):
+        await send_unauthorized_message(message)
+        return
+    if BOT_PAUSED:
+        await message.answer("Bot is currently paused")
+        return
+    if platform.system() == "Windows":
+        subprocess.run(["taskkill", "/F", "/IM", "Spotify.exe"])
+    elif platform.system() == "Darwin":
+        subprocess.run(["pkill", "-x", "Spotify"])
+    elif platform.system() == "Linux":
+        subprocess.run(["pkill", "Spotify"])
     else:
         print("Unsupported operating system")
 

@@ -1,5 +1,10 @@
 import json
-import logging, os, platform, subprocess, pyautogui, time
+import logging
+import os
+import platform
+import subprocess
+import pyautogui
+import time
 from aiogram import Bot, Dispatcher, types
 from aiogram.utils import executor
 from PIL import Image, ImageDraw, ImageFont
@@ -25,6 +30,27 @@ BOT_PAUSED = False
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
+commands = """
+/start - Starting bot
+/enable_bot - Enable bot
+/disable_bot - Disable bot
+/steam_start - Open steam
+/steam_close - Close steam
+/spotify_start - Open spotify
+/spotify_close - Close spotify
+/chrome - Open a chrome with querry (need querry inputs)
+/chrome_close - Close a chrome
+/screen - Send a screen of window on PC
+/screen_framed - Screenshot divided into frames
+/click - Click at exact place (x,y)
+/double_click - LMB doubleclick
+/scroll - Scroll up or down (with negative numbers)
+/move_to - Move to exact place
+/close - Close any app
+/reboot - Reboot PC
+/power_off - Turn off PC
+"""
+
 
 def is_admin(user_id: int) -> bool:
     """Check if a user is an admin."""
@@ -38,7 +64,7 @@ async def send_unauthorized_message(message: types.Message):
     )
 
 
-# Command handlers
+# Start handler
 @dp.message_handler(commands=["start"])
 async def cmd_start(message: types.Message):
     """Start command handler."""
@@ -49,6 +75,19 @@ async def cmd_start(message: types.Message):
         await message.answer("Bot is currently paused")
         return
     await message.answer("Hello! I'm your bot. Send me a message!")
+
+
+# Command handlers
+@dp.message_handler(commands=["commands"])
+async def commands(message: types.Message):
+    """Start command handler."""
+    if not is_admin(message.from_user.id):
+        await send_unauthorized_message(message)
+        return
+    if BOT_PAUSED:
+        await message.answer("Bot is currently paused")
+        return
+    await message.answer(commands)
 
 
 # /steam_start
@@ -91,7 +130,7 @@ async def steam_close(message: types.Message):
 
 # /spotify_start
 @dp.message_handler(commands=["spotify_start"])
-async def steam_start(message: types.Message):
+async def spotify_start(message: types.Message):
     """Start Steam command handler."""
     if not is_admin(message.from_user.id):
         await send_unauthorized_message(message)
@@ -109,7 +148,7 @@ async def steam_start(message: types.Message):
 
 # /spotify_close
 @dp.message_handler(commands=["spotify_close"])
-async def steam_close(message: types.Message):
+async def spotify_close(message: types.Message):
     """Close Steam command handler."""
     if not is_admin(message.from_user.id):
         await send_unauthorized_message(message)

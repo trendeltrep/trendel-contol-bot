@@ -9,7 +9,9 @@ from PIL import Image, ImageDraw, ImageFont
 logging.basicConfig(level=logging.INFO)
 
 # Load configuration from JSON file
-with open("config.json", "r") as config_file:
+script_directory = os.path.dirname(os.path.abspath(__file__))
+config_path = os.path.join(script_directory, "config.json")
+with open(config_path, "r") as config_file:
     config = json.load(config_file)
 # Load configuration from config
 API_TOKEN = config["API_TOKEN"]

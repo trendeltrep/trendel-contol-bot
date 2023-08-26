@@ -21,6 +21,7 @@ from pc import (
     power_off,
 )
 
+#
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 
@@ -29,6 +30,7 @@ script_directory = os.path.dirname(os.path.abspath(__file__))
 config_path = os.path.join(script_directory, "config.json")
 with open(config_path, "r") as config_file:
     config = json.load(config_file)
+
 # Load configuration from config
 API_TOKEN = config["API_TOKEN"]
 PATH_TO_STEAM = config["PATH_TO_STEAM"]

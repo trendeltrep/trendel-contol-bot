@@ -6,10 +6,10 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.utils import executor
 
 
-from Steam import steam_start, steam_close
-from Spotify import spotify_start, spotify_close
+from steam import steam_start, steam_close
+from spotify import spotify_start, spotify_close
 from Chrome import chrome_open, chrome_close
-from PC import (
+from pc import (
     take_screenshot,
     take_screenshot_framed,
     close,

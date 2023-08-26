@@ -8,7 +8,7 @@ from aiogram.utils import executor
 
 from steam import steam_start, steam_close
 from spotify import spotify_start, spotify_close
-from Chrome import chrome_open, chrome_close
+from chrome import chrome_open, chrome_close
 from pc import (
     take_screenshot,
     take_screenshot_framed,

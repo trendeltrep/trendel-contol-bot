@@ -5,6 +5,7 @@ import platform
 import subprocess
 import pyautogui
 import time
+import functools
 from aiogram import Bot, Dispatcher, types
 from aiogram.utils import executor
 from PIL import Image, ImageDraw, ImageFont
@@ -34,8 +35,8 @@ commands = """
 /start - Starting bot
 /enable_bot - Enable bot
 /pause_bot - Pause bot
-/steam_start - Open steam
-/steam_close - Close steam
+/_start - Open 
+/_close - Close 
 /spotify_start - Open spotify
 /spotify_close - Close spotify
 /chrome - Open a chrome with querry (need querry inputs)
@@ -64,99 +65,88 @@ async def send_unauthorized_message(message: types.Message):
     )
 
 
+def admin_and_not_paused(func):
+    @functools.wraps(func)
+    async def wrapper(message: types.Message, *args, **kwargs):
+        if not is_admin(message.from_user.id):
+            await send_unauthorized_message(message)
+        elif BOT_PAUSED:
+            await message.answer("Bot is currently paused")
+        else:
+            await func(message, *args, **kwargs)
+
+    return wrapper
+
+
 # Start handler
 @dp.message_handler(commands=["start"])
+@admin_and_not_paused
 async def cmd_start(message: types.Message):
     """Start command handler."""
-    if not is_admin(message.from_user.id):
-        await send_unauthorized_message(message)
-        return
-    if BOT_PAUSED:
-        await message.answer("Bot is currently paused")
-        return
+
     await message.answer("Hello! I'm your bot. Send me a message!")
 
 
 # Command handlers
 # /help
 @dp.message_handler(commands=["help"])
+@admin_and_not_paused
 async def help(message: types.Message):
     """Start command handler."""
-    if not is_admin(message.from_user.id):
-        await send_unauthorized_message(message)
-        return
-    if BOT_PAUSED:
-        await message.answer("Bot is currently paused")
-        return
+
     await message.answer(commands)
 
 
-# /steam_start
-@dp.message_handler(commands=["steam_start"])
-async def steam_start(message: types.Message):
-    """Start Steam command handler."""
-    if not is_admin(message.from_user.id):
-        await send_unauthorized_message(message)
-        return
-    if BOT_PAUSED:
-        await message.answer("Bot is currently paused")
-        return
+# /_start
+@dp.message_handler(commands=["_start"])
+@admin_and_not_paused
+async def _start(message: types.Message):
+    """Start  command handler."""
+
     try:
         await message.answer("Opening...")
-        subprocess.Popen([PATH_TO_STEAM])
+        subprocess.Popen([PATH_TO_])
         await message.answer("Done")
     except Exception as e:
-        await message.answer(f"Error opening Steam: {e}")
+        await message.answer(f"Error opening : {e}")
 
 
-# /steam_close
-@dp.message_handler(commands=["steam_close"])
-async def steam_close(message: types.Message):
-    """Close Steam command handler."""
-    if not is_admin(message.from_user.id):
-        await send_unauthorized_message(message)
-        return
-    if BOT_PAUSED:
-        await message.answer("Bot is currently paused")
-        return
+# /_close
+@dp.message_handler(commands=["_close"])
+@admin_and_not_paused
+async def _close(message: types.Message):
+    """Close  command handler."""
+
     if platform.system() == "Windows":
-        subprocess.run(["taskkill", "/F", "/IM", "steam.exe"])
+        subprocess.run(["taskkill", "/F", "/IM", ".exe"])
     elif platform.system() == "Darwin":
-        subprocess.run(["pkill", "-x", "Steam"])
+        subprocess.run(["pkill", "-x", ""])
     elif platform.system() == "Linux":
-        subprocess.run(["pkill", "steam"])
+        subprocess.run(["pkill", ""])
     else:
         print("Unsupported operating system")
 
 
 # /spotify_start
 @dp.message_handler(commands=["spotify_start"])
+@admin_and_not_paused
 async def spotify_start(message: types.Message):
-    """Start Steam command handler."""
-    if not is_admin(message.from_user.id):
-        await send_unauthorized_message(message)
-        return
-    if BOT_PAUSED:
-        await message.answer("Bot is currently paused")
-        return
+    """Start  command handler."""
+
     try:
         await message.answer("Opening...")
         subprocess.Popen([PATH_TO_SPOTIFY])
         await message.answer("Done")
     except Exception as e:
-        await message.answer(f"Error opening Steam: {e}")
+        await message.answer(f"Error opening : {e}")
 
 
 # /spotify_close
 @dp.message_handler(commands=["spotify_close"])
+@admin_and_not_paused
 async def spotify_close(message: types.Message):
-    """Close Steam command handler."""
-    if not is_admin(message.from_user.id):
-        await send_unauthorized_message(message)
-        return
-    if BOT_PAUSED:
-        await message.answer("Bot is currently paused")
-        return
+    """Close  command handler."""
+
     if platform.system() == "Windows":
         subprocess.run(["taskkill", "/F", "/IM", "Spotify.exe"])
     elif platform.system() == "Darwin":
@@ -169,14 +159,10 @@ async def spotify_close(message: types.Message):
 
 # /screen
 @dp.message_handler(commands=["screen"])
+@admin_and_not_paused
 async def take_screenshot(message: types.Message):
     """Take a screenshot and send it command handler."""
-    if not is_admin(message.from_user.id):
-        await send_unauthorized_message(message)
-        return
-    if BOT_PAUSED:
-        await message.answer("Bot is currently paused")
-        return
+
     try:
         screenshot_path = "screenshot.png"
         pyautogui.screenshot(screenshot_path)
@@ -189,14 +175,10 @@ async def take_screenshot(message: types.Message):
 
 # /screen_framed | /screen_framed *num*
 @dp.message_handler(commands=["screen_framed"])
+@admin_and_not_paused
 async def take_screenshot_framed(message: types.Message):
     """Take a screenshot and send it command handler."""
-    if not is_admin(message.from_user.id):
-        await send_unauthorized_message(message)
-        return
-    if BOT_PAUSED:
-        await message.answer("Bot is currently paused")
-        return
+
     try:
         screenshot_path = "screenshot.png"
         pyautogui.screenshot(screenshot_path)
@@ -237,14 +219,8 @@ async def take_screenshot_framed(message: types.Message):
 
 # /chrome *input*
 @dp.message_handler(commands=["chrome"])
+@admin_and_not_paused
 async def chrome_open(message: types.Message):
-    if not is_admin(message.from_user.id):
-        await send_unauthorized_message(message)
-        return
-
-    if BOT_PAUSED:
-        await message.answer("Bot is currently paused")
-        return
     query = " ".join(message.text.split()[1:])  # Extract the search query
     search_url = f"https://www.google.com/search?q={query}"
     # Open Google Chrome with the search URL
@@ -287,13 +263,8 @@ async def chrome_open(message: types.Message):
 
 # /close *any apps in lowercase*
 @dp.message_handler(commands=["close"])
+@admin_and_not_paused
 async def close(message: types.Message):
-    if not is_admin(message.from_user.id):
-        await send_unauthorized_message(message)
-        return
-    if BOT_PAUSED:
-        await message.answer("Bot is currently paused")
-        return
     apps = message.text.split()[1:]
     for app in apps:
         if platform.system() == "Windows":
@@ -312,13 +283,8 @@ async def close(message: types.Message):
 # Register a command handler to close browser
 # /chrome_close
 @dp.message_handler(commands=["chrome_close"])
+@admin_and_not_paused
 async def chrome_close(message: types.Message):
-    if not is_admin(message.from_user.id):
-        await send_unauthorized_message(message)
-        return
-    if BOT_PAUSED:
-        await message.answer("Bot is currently paused")
-        return
     if platform.system() == "Windows":
         subprocess.run(["taskkill", "/F", "/IM", "chrome.exe"])
     elif platform.system() == "Darwin":
@@ -332,15 +298,8 @@ async def chrome_close(message: types.Message):
 # Register a command handler to click at exact place
 # /click | /click x y
 @dp.message_handler(commands=["click"])
+@admin_and_not_paused
 async def click(message: types.Message):
-    if not is_admin(message.from_user.id):
-        await send_unauthorized_message(message)
-        return
-
-    if BOT_PAUSED:
-        await message.answer("Bot is currently paused")
-        return
-
     coords = message.text.split()[1:]  # Extract coordinates
     if len(coords) == 2:
         try:
@@ -361,27 +320,16 @@ async def click(message: types.Message):
 
 # /double_click
 @dp.message_handler(commands=["double_click"])
+@admin_and_not_paused
 async def double_click(message: types.Message):
-    if not is_admin(message.from_user.id):
-        await send_unauthorized_message(message)
-        return
-    if BOT_PAUSED:
-        await message.answer("Bot is currently paused")
-        return
     pyautogui.doubleClick()
 
 
 # Register a command handler to click at exact place
 # /move_to x y
 @dp.message_handler(commands=["move_to"])
+@admin_and_not_paused
 async def move_to(message: types.Message):
-    if not is_admin(message.from_user.id):
-        await send_unauthorized_message(message)
-        return
-
-    if BOT_PAUSED:
-        await message.answer("Bot is currently paused")
-        return
     coords = message.text.split()[1:]  # Extract coordinates
     if len(coords) == 2:
         try:
@@ -397,15 +345,10 @@ async def move_to(message: types.Message):
 # Register a command handler to scrolling
 # /scroll *num*
 @dp.message_handler(commands=["scroll"])
+@admin_and_not_paused
 async def scroll_page(message: types.Message):
     """Scroll a specified number of times command handler."""
-    if not is_admin(message.from_user.id):
-        await send_unauthorized_message(message)
-        return
 
-    if BOT_PAUSED:
-        await message.answer("Bot is currently paused")
-        return
     try:
         scroll_value = int(message.text.split()[1])
         screen_height = pyautogui.size().height
@@ -436,13 +379,8 @@ async def scroll_page(message: types.Message):
 # Register a command handler to reboot the computer
 # /reboot
 @dp.message_handler(commands=["reboot"])
+@admin_and_not_paused
 async def reboot(message: types.Message):
-    if not is_admin(message.from_user.id):
-        await send_unauthorized_message(message)
-        return
-    if BOT_PAUSED:
-        await message.answer("Bot is currently paused")
-        return
     system = platform.system()
     try:
         if system == "Windows":
@@ -460,13 +398,8 @@ async def reboot(message: types.Message):
 # Register a command handler to power off the computer
 # /power_off
 @dp.message_handler(commands=["power_off"])
+@admin_and_not_paused
 async def power_off(message: types.Message):
-    if not is_admin(message.from_user.id):
-        await send_unauthorized_message(message)
-        return
-    if BOT_PAUSED:
-        await message.answer("Bot is currently paused")
-        return
     system = platform.system()
     try:
         if system == "Windows":
@@ -489,24 +422,24 @@ async def enable_bot(message: types.Message):
         return
     global BOT_PAUSED
     BOT_PAUSED = False
+    await message.answer("Bot enabled")
 
 
 # /pause_bot
 @dp.message_handler(commands=["pause_bot"])
 async def pause_bot(message: types.Message):
+    global BOT_PAUSED
+    BOT_PAUSED = True
     if not is_admin(message.from_user.id):
         await send_unauthorized_message(message)
         return
-    global BOT_PAUSED
-    BOT_PAUSED = True
+    await message.answer("Bot paused")
 
 
 # Register a text message handler
 @dp.message_handler(content_types=types.ContentTypes.TEXT)
+@admin_and_not_paused
 async def test(message: types.Message):
-    if not is_admin(message.from_user.id):
-        await send_unauthorized_message(message)
-        return
     words = message.text.split()[1:]  # Skip the command itself
     for word in words:
         await message.answer(word)

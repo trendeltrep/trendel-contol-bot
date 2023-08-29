@@ -8,7 +8,14 @@ from aiogram.utils import executor
 from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOAuth
 from steam import steam_start, steam_close
-from spotify import spotify_start, spotify_close, search_music, play_track
+from spotify import (
+    spotify_start,
+    spotify_close,
+    search_music,
+    play_track,
+    pause_music,
+    resume_music,
+)
 from chrome import chrome_open, chrome_close
 from pc import (
     take_screenshot,
@@ -69,9 +76,9 @@ commands = """
 /spotify_start - Open spotify
 /spotify_close - Close spotify
 /search_music - Search a music at spotify needs querry
-/play_msuic - Needs id track
-/pause_music - Pause music
-/resume_music - Resume music
+/play_msuic - Needs id track from "/search_music" (spotify:track:*id*)
+/pause_music - Pause music 
+/resume_music - Resume music 
 /chrome - Open a chrome with querry (need querry inputs)
 /chrome_close - Close a chrome
 /screen - Send a screen of window on PC
@@ -274,6 +281,20 @@ async def play(message: types.Message):
         await message.answer("Playback started.")
     else:
         await message.answer("Failed to start playback.")
+
+
+# /pause_music
+@dp.message_handler(commands=["pause_music"])
+@admin_and_not_paused
+async def p(message: types.Message):
+    await pause_music(sp, message)
+
+
+# /resume_music
+@dp.message_handler(commands=["resume_music"])
+@admin_and_paused
+async def r(message: types.Message):
+    await resume_music(sp, message)
 
 
 # /enable_bot

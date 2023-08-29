@@ -42,3 +42,19 @@ async def play_track(sp: Spotify, uri: str) -> bool:
         print("Error playing track:", e)
         return False
 
+
+async def pause_music(sp:Spotify,message: types.Message):
+    try:
+        sp.pause_playback()
+        await message.answer("Playback paused.")
+    except Exception as e:
+        print("Error pausing playback:", e)
+        await message.answer("Failed to pause playback.")
+
+async def resume_music(sp:Spotify,message: types.Message):
+    try:
+        sp.start_playback()
+        await message.answer("Playback resumed.")
+    except Exception as e:
+        print("Error resuming playback:", e)
+        await message.answer("Failed to resume playback.")

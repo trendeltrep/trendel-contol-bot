@@ -6,7 +6,7 @@ This is a Telegram bot that allows you to control various functions on your PC, 
 
 1. Clone this repository to your local machine. `git clone https://github.com/trendeltrep/trendel-contol-bot.git`
 
-2. Install the required dependencies using the following command: `pip install -r requirements.txt`
+2. Install the required dependencies using the following command: `pip3 install -r requirements.txt`
 
 3. Create a `config.json` file in the root directory of the project with the following structure:
 
@@ -26,9 +26,7 @@ This is a Telegram bot that allows you to control various functions on your PC, 
 
 4. Replace the placeholders with your actual values
 
-5. Start the bot by running the following command:
-
-`python control_bot.py`
+5. Start the bot by running the following command: `python control_bot.py`
 
 6. Interact with the bot by sending commands to your bot on Telegram.
 

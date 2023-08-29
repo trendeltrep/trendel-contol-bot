@@ -68,28 +68,29 @@ bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
 commands = """
-/start - Starting bot
-/enable_bot - Enable bot
-/pause_bot - Pause bot
-/steam_start - Open 
-/steam_close - Close 
-/spotify_start - Open spotify
-/spotify_close - Close spotify
-/search_music - Search a music at spotify needs querry
-/play_msuic - Needs id track from "/search_music" (spotify:track:*id*) | needs premium
-/pause_music - Pause music | needs premium
-/resume_music - Resume music | needs premium
-/chrome - Open a chrome with querry (need querry inputs) | needs premium
-/chrome_close - Close a chrome
-/screen - Send a screen of window on PC
-/screen_framed - Screenshot divided into frames
-/click - Click at exact place (x,y)
-/double_click - LMB doubleclick
-/scroll - Scroll up or down (with negative numbers)
-/move_to - Move to exact place
-/close - Close any app
-/reboot - Reboot PC
-/power_off - Turn off PC
+/start: Start the bot.
+/help: Display available commands and their usage.
+/enable_bot: Enable the bot (admin only).
+/pause_bot: Pause the bot (admin only).
+/steam_start: Open Steam.
+/steam_close: Close Steam.
+/spotify_start: Open Spotify.
+/spotify_close: Close Spotify.
+/search_music : Search for music on Spotify.
+/play_music <track_uri>: Play a track on Spotify.
+/pause_music: Pause music playback on Spotify.
+/resume_music: Resume music playback on Spotify.
+/chrome : Open Chrome with a specific query.
+/chrome_close: Close Chrome.
+/screen: Take a screenshot of the current window.
+/screen_framed: Take a framed screenshot of the current window.
+/click : Simulate a click at the specified coordinates.
+/double_click : Simulate a double click at the specified coordinates.
+/move_to : Move the cursor to the specified coordinates.
+/scroll : Scroll the page up or down by the given amount.
+/close <app_name>: Close a specific application.
+/reboot: Reboot the PC.
+/power_off: Turn off the PC.
 """
 
 
@@ -323,9 +324,7 @@ async def pause_bot(message: types.Message):
 @dp.message_handler(content_types=types.ContentTypes.TEXT)
 @admin_and_not_paused
 async def test(message: types.Message):
-    words = message.text.split()[1:]  # Skip the command itself
-    for word in words:
-        await message.answer(word)
+    await message.answer(message.from_user.id)
 
 
 if __name__ == "__main__":

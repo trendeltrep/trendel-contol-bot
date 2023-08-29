@@ -4,7 +4,8 @@ from aiogram import types
 
 
 async def steam_start(path: str, message: types.Message):
-    """Start Steam command handler."""
+    # Start Steam command handler.
+
     try:
         await message.answer("Opening...")
         subprocess.Popen([path])
@@ -14,7 +15,8 @@ async def steam_start(path: str, message: types.Message):
 
 
 async def steam_close(message: types.Message):
-    """Close Steam command handler."""
+    # Close Steam command handler.
+
     if platform.system() == "Windows":
         subprocess.run(["taskkill", "/F", "/IM", "steam.exe"])
     elif platform.system() == "Darwin":

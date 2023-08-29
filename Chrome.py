@@ -8,6 +8,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 async def chrome_open(bot: Bot, path: str, message: types.Message):
+    # handler
     query = " ".join(message.text.split()[1:])  # Extract the search query
     search_url = f"https://www.google.com/search?q={query}"
     # Open Google Chrome with the search URL
@@ -49,6 +50,7 @@ async def chrome_open(bot: Bot, path: str, message: types.Message):
 
 
 async def chrome_close(message: types.Message):
+    #
     if platform.system() == "Windows":
         subprocess.run(["taskkill", "/F", "/IM", "chrome.exe"])
     elif platform.system() == "Darwin":

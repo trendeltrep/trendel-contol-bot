@@ -5,9 +5,10 @@ import functools
 from aiogram import Bot, Dispatcher, types
 from aiogram.utils import executor
 
-
+from spotipy import Spotify
+from spotipy.oauth2 import SpotifyOAuth
 from steam import steam_start, steam_close
-from spotify import spotify_start, spotify_close
+from spotify import spotify_start, spotify_close, search_music, play_track
 from chrome import chrome_open, chrome_close
 from pc import (
     take_screenshot,
@@ -37,7 +38,23 @@ PATH_TO_STEAM = config["PATH_TO_STEAM"]
 PATH_TO_CHROME = config["PATH_TO_CHROME"]
 PATH_TO_SPOTIFY = config["PATH_TO_SPOTIFY"]
 ADMIN_ID = config["ADMIN_ID"]
+CLIENT_ID_SPOTIFY = config["CLIENT_ID_SPOTIFY"]
+CLIENT_SECRET_SPOTIFY = config["CLIENT_SECRET_SPOTIFY"]
+SPOTIFY_REDIRECT_URI = config["SPOTIFY_REDIRECT_URI"]
+SPOTIFY_USERNAME = config["SPOTIFY_USERNAME"]
+
+
 BOT_PAUSED = False
+
+
+sp_oauth = SpotifyOAuth(
+    client_id=CLIENT_ID_SPOTIFY,
+    client_secret=CLIENT_SECRET_SPOTIFY,
+    redirect_uri=SPOTIFY_REDIRECT_URI,
+    scope="user-library-read user-modify-playback-state user-read-playback-state",
+)
+sp = Spotify(auth_manager=sp_oauth)
+
 
 # Initialize bot and dispatcher
 bot = Bot(token=API_TOKEN)
@@ -47,10 +64,14 @@ commands = """
 /start - Starting bot
 /enable_bot - Enable bot
 /pause_bot - Pause bot
-/_start - Open 
-/_close - Close 
+/steam_start - Open 
+/steam_close - Close 
 /spotify_start - Open spotify
 /spotify_close - Close spotify
+/search_music - Search a music at spotify needs querry
+/play_msuic - Needs id track
+/pause_music - Pause music
+/resume_music - Resume music
 /chrome - Open a chrome with querry (need querry inputs)
 /chrome_close - Close a chrome
 /screen - Send a screen of window on PC
@@ -218,6 +239,41 @@ async def r(message: types.Message):
 @admin_and_not_paused
 async def p_off(message: types.Message):
     await power_off(message)
+
+
+# /search_music *query*
+@dp.message_handler(commands=["search_music"])
+@admin_and_not_paused
+async def s_music(message: types.Message):
+    query = message.text[len("/search_music") :].strip()
+    tracks = await search_music(sp, query)
+    response = "Search results:\n"
+    for i, track in enumerate(tracks, start=1):
+        track_name = track.get("name", "Unknown Track")
+        artists = ", ".join(
+            artist.get("name", "Unknown Artist") for artist in track.get("artists", [])
+        )
+        uri = track.get("uri", "No URI")
+        response += f"{i}. {track_name} - {artists} : {uri}\n"
+    await message.answer(response)
+
+
+# /play *track id from /search_music*
+@dp.message_handler(commands=["play_music"])
+@admin_and_not_paused
+async def play(message: types.Message):
+    command_args = message.text.split()
+    if len(command_args) != 2:
+        await message.answer("Usage: /play_music <track_uri>")
+        return
+
+    track_uri = command_args[1]
+    success = await play_track(sp, track_uri)
+
+    if success:
+        await message.answer("Playback started.")
+    else:
+        await message.answer("Failed to start playback.")
 
 
 # /enable_bot

@@ -292,7 +292,7 @@ async def p(message: types.Message):
 
 # /resume_music
 @dp.message_handler(commands=["resume_music"])
-@admin_and_paused
+@admin_and_not_paused
 async def r(message: types.Message):
     await resume_music(sp, message)
 

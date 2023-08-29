@@ -76,10 +76,10 @@ commands = """
 /spotify_start - Open spotify
 /spotify_close - Close spotify
 /search_music - Search a music at spotify needs querry
-/play_msuic - Needs id track from "/search_music" (spotify:track:*id*)
-/pause_music - Pause music 
-/resume_music - Resume music 
-/chrome - Open a chrome with querry (need querry inputs)
+/play_msuic - Needs id track from "/search_music" (spotify:track:*id*) | needs premium
+/pause_music - Pause music | needs premium
+/resume_music - Resume music | needs premium
+/chrome - Open a chrome with querry (need querry inputs) | needs premium
 /chrome_close - Close a chrome
 /screen - Send a screen of window on PC
 /screen_framed - Screenshot divided into frames

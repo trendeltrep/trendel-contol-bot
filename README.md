@@ -55,3 +55,42 @@ This is a Telegram bot that allows you to control various functions on your PC, 
 - /close <app_name>: Close a specific application.
 - /reboot: Reboot the PC.
 - /power_off: Turn off the PC.
+
+## Installing a .exe file via pyinstaller
+
+1. Run the following command to generate a .spec file for your script: `pyinstaller control_bot.py`
+
+This will generate a control_bot.spec file in the same directory as your script.
+
+2. Open the control_bot.spec file using a text editor.
+
+3. Locate the datas list in the .spec file (it will be in a = Analysis()). It will look something like this:
+
+```
+List of data files and tuples to include
+[('source', 'destination'), ...]
+```
+
+<pre>
+datas = []
+</pre>
+
+4. Add your data files and their corresponding destination paths to the datas list. Each entry in the list should be a tuple containing the source file and the destination directory.
+
+For example, to include "config.json", "pc.py", "spotify.py", "chrome.py", and "steam.py" from the current directory, you would add the following lines:
+
+<pre>
+datas = [
+    ('config.json', '.'),
+    ('pc.py', '.'),
+    ('spotify.py', '.'),
+    ('chrome.py', '.'),
+    ('steam.py', '.'),
+]
+</pre>
+
+Make sure to adjust the file names and paths according to your project structure.
+
+5. Save the .spec file.
+
+6. Build the executable using the modified .spec file: `pyinstaller control_bot.spec`

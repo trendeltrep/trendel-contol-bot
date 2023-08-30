@@ -7,6 +7,8 @@ from aiogram.utils import executor
 
 from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOAuth
+
+from commands import get_commands
 from steam import steam_start, steam_close
 from spotify import (
     spotify_start,
@@ -23,6 +25,7 @@ from pc import (
     close,
     click,
     double_click,
+    right_click,
     move_to,
     scroll_page,
     reboot,
@@ -67,32 +70,6 @@ sp = Spotify(auth_manager=sp_oauth)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
-commands = """
-/start: Start the bot.
-/help: Display available commands and their usage.
-/enable_bot: Enable the bot (admin only).
-/pause_bot: Pause the bot (admin only).
-/steam_start: Open Steam.
-/steam_close: Close Steam.
-/spotify_start: Open Spotify.
-/spotify_close: Close Spotify.
-/search_music : Search for music on Spotify.
-/play_music <track_uri>: Play a track on Spotify.
-/pause_music: Pause music playback on Spotify.
-/resume_music: Resume music playback on Spotify.
-/chrome : Open Chrome with a specific query.
-/chrome_close: Close Chrome.
-/screen: Take a screenshot of the current window.
-/screen_framed: Take a framed screenshot of the current window.
-/click : Simulate a click at the specified coordinates.
-/double_click : Simulate a double click at the specified coordinates.
-/move_to : Move the cursor to the specified coordinates.
-/scroll : Scroll the page up or down by the given amount.
-/close <app_name>: Close a specific application.
-/reboot: Reboot the PC.
-/power_off: Turn off the PC.
-"""
-
 
 def is_admin(user_id: int) -> bool:
     """Check if a user is an admin."""
@@ -135,7 +112,11 @@ async def cmd_start(message: types.Message):
 async def help(message: types.Message):
     """Start command handler."""
 
-    await message.answer(commands)
+    commands = await get_commands()
+    msg = ""
+    for command, description in commands.items():
+        msg += f"/{command} : {description} \n"
+    await message.answer(msg)
 
 
 # /steam_start

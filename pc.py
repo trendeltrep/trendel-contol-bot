@@ -8,7 +8,6 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 async def take_screenshot(bot: Bot, message: types.Message):
-
     # Take a screenshot and send it command handler.
     try:
         screenshot_path = "screenshot.png"
@@ -21,7 +20,6 @@ async def take_screenshot(bot: Bot, message: types.Message):
 
 
 async def take_screenshot_framed(bot: Bot, message: types.Message):
-
     # Take a screenshot and send it command handler.
 
     try:
@@ -63,7 +61,7 @@ async def take_screenshot_framed(bot: Bot, message: types.Message):
 
 
 async def close(message: types.Message):
-    # 
+    #
     apps = message.text.split()[1:]
     for app in apps:
         if platform.system() == "Windows":
@@ -80,7 +78,7 @@ async def close(message: types.Message):
 
 
 async def click(message: types.Message):
-    # 
+    #
     coords = message.text.split()[1:]  # Extract coordinates
     if len(coords) == 2:
         try:
@@ -98,12 +96,19 @@ async def click(message: types.Message):
     else:
         await message.answer("Invalid number of coordinates. Use /click x y")
 
+
 async def double_click(message: types.Message):
-    # 
+    #
     pyautogui.doubleClick()
 
+
+async def right_click(message: types.Message):
+    #
+    pyautogui.rightClick()
+
+
 async def move_to(message: types.Message):
-    # 
+    #
     coords = message.text.split()[1:]  # Extract coordinates
     if len(coords) == 2:
         try:
@@ -115,7 +120,8 @@ async def move_to(message: types.Message):
     else:
         await message.answer("Invalid number of coordinates.")
 
-async def scroll_page(bot:Bot,message: types.Message):
+
+async def scroll_page(bot: Bot, message: types.Message):
     # Scroll a specified number of times command handler.
 
     try:
@@ -144,8 +150,9 @@ async def scroll_page(bot:Bot,message: types.Message):
     except (IndexError, ValueError):
         await message.answer("Invalid command format. Use /scroll <value>")
 
+
 async def reboot(message: types.Message):
-    # 
+    #
     system = platform.system()
     try:
         if system == "Windows":
@@ -159,8 +166,8 @@ async def reboot(message: types.Message):
     except subprocess.CalledProcessError as e:
         print(f"Error rebooting: {e}")
 
-async def power_off(message: types.Message):\
-    # 
+
+async def power_off(message: types.Message):  #
     system = platform.system()
     try:
         if system == "Windows":

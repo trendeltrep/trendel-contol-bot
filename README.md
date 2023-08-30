@@ -77,16 +77,13 @@ datas = []
 
 4. Add your data files and their corresponding destination paths to the datas list. Each entry in the list should be a tuple containing the source file and the destination directory.
 
-For example, to include "config.json", "pc.py", "spotify.py", "chrome.py", and "steam.py" from the current directory, you would add the following lines:
+You need to include "config.json", "commands.json" from the current directory, adding the following lines:
 
 <pre>
 datas = [
-    ('config.json', '.'),
-    ('pc.py', '.'),
-    ('spotify.py', '.'),
-    ('chrome.py', '.'),
-    ('steam.py', '.'),
-]
+('config.json', '.'),
+('commands.json', '.'),
+],
 </pre>
 
 Make sure to adjust the file names and paths according to your project structure.

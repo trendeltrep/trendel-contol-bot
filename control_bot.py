@@ -1,6 +1,4 @@
-import json
 import logging
-import os
 import functools
 from aiogram import Bot, Dispatcher, types
 from aiogram.utils import executor
@@ -8,7 +6,7 @@ from aiogram.utils import executor
 from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOAuth
 
-from commands import get_commands
+from loading import get_commands, get_config
 from steam import steam_start, steam_close
 from spotify import (
     spotify_start,
@@ -36,11 +34,8 @@ from pc import (
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 
-# Load configuration from JSON file
-script_directory = os.path.dirname(os.path.abspath(__file__))
-config_path = os.path.join(script_directory, "config.json")
-with open(config_path, "r") as config_file:
-    config = json.load(config_file)
+commands = get_commands().items()
+config = get_config()
 
 # Load configuration from config
 API_TOKEN = config["API_TOKEN"]
@@ -111,11 +106,9 @@ async def cmd_start(message: types.Message):
 @admin_and_not_paused
 async def help(message: types.Message):
     """Start command handler."""
-
-    commands = await get_commands()
     msg = ""
-    for command, description in commands.items():
-        msg += f"/{command} : {description} \n"
+    for com, desc in commands:
+        msg += f"/{com} : {desc} \n"
     await message.answer(msg)
 
 
@@ -196,6 +189,13 @@ async def c(message: types.Message):
 @admin_and_not_paused
 async def d_c(message: types.Message):
     await double_click(message)
+
+
+# /right_click
+@dp.message_handler(commands=["right_click"])
+@admin_and_not_paused
+async def r_c(message: types.Message):
+    await right_click(message)
 
 
 # Register a command handler to click at exact place

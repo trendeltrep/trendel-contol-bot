@@ -109,7 +109,8 @@ async def help(message: types.Message):
     msg = ""
     for com, desc in commands:
         msg += f"/{com} : {desc} \n"
-    await message.answer(msg)
+    pin_msg = await message.answer(msg)
+    await bot.pin_chat_message(message.chat.id, pin_msg.message_id)
 
 
 # /steam_start

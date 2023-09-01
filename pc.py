@@ -168,15 +168,27 @@ async def reboot(message: types.Message):
 
 
 async def power_off(message: types.Message):  #
+    shut_time = message.text.split()[1:]
     system = platform.system()
-    try:
-        if system == "Windows":
-            subprocess.run(["shutdown", "/s", "/f", "/t", "0"], check=True)
-        elif system == "Linux":
-            subprocess.run(["shutdown", "-h", "now"], check=True)
-        elif system == "Darwin":
-            subprocess.run(["sudo", "shutdown", "-h", "now"], check=True)
-        else:
-            print("Unsupported operating system")
-    except subprocess.CalledProcessError as e:
-        print(f"Error powering off: {e}")
+
+    if len(shut_time) == 1:
+        try:
+            s_t = int(shut_time[0], 10) * 60
+            if system == "Windows":
+                subprocess.run(["shutdown", "/s", "/f", "/t", f"{s_t}"], check=True)
+            else:
+                print("Unsupported operating system")
+        except subprocess.CalledProcessError as e:
+            print(f"Error powering off: {e}")
+    else:
+        try:
+            if system == "Windows":
+                subprocess.run(["shutdown", "/s", "/f", "/t", "0"], check=True)
+            elif system == "Linux":
+                subprocess.run(["shutdown", "-h", "now"], check=True)
+            elif system == "Darwin":
+                subprocess.run(["sudo", "shutdown", "-h", "now"], check=True)
+            else:
+                print("Unsupported operating system")
+        except subprocess.CalledProcessError as e:
+            print(f"Error powering off: {e}")

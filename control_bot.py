@@ -27,6 +27,7 @@ from pc import (
     move_to,
     scroll_page,
     reboot,
+    sleep,
     power_off,
 )
 
@@ -223,7 +224,7 @@ async def r(message: types.Message):
 
 
 # Register a command handler to power off the computer
-# /power_off
+# /power_off | /power_off *int* - minutes
 @dp.message_handler(commands=["power_off"])
 @admin_and_not_paused
 async def p_off(message: types.Message):

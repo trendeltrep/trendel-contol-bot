@@ -27,7 +27,6 @@ from pc import (
     move_to,
     scroll_page,
     reboot,
-    sleep,
     power_off,
 )
 

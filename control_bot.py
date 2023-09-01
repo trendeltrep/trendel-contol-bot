@@ -20,7 +20,7 @@ from chrome import chrome_open, chrome_close
 from pc import (
     take_screenshot,
     take_screenshot_framed,
-    close,
+    close_app,
     click,
     double_click,
     right_click,
@@ -30,7 +30,6 @@ from pc import (
     power_off,
 )
 
-#
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 
@@ -48,9 +47,7 @@ CLIENT_SECRET_SPOTIFY = config["CLIENT_SECRET_SPOTIFY"]
 SPOTIFY_REDIRECT_URI = config["SPOTIFY_REDIRECT_URI"]
 SPOTIFY_USERNAME = config["SPOTIFY_USERNAME"]
 
-
 BOT_PAUSED = False
-
 
 sp_oauth = SpotifyOAuth(
     client_id=CLIENT_ID_SPOTIFY,
@@ -59,7 +56,6 @@ sp_oauth = SpotifyOAuth(
     scope="user-library-read user-modify-playback-state user-read-playback-state",
 )
 sp = Spotify(auth_manager=sp_oauth)
-
 
 # Initialize bot and dispatcher
 bot = Bot(token=API_TOKEN)
@@ -96,7 +92,6 @@ def admin_and_not_paused(func):
 @admin_and_not_paused
 async def cmd_start(message: types.Message):
     """Start command handler."""
-
     await message.answer("Hello! I'm your bot. Send me a message!")
 
 
@@ -166,7 +161,7 @@ async def c_open(message: types.Message):
 @dp.message_handler(commands=["close"])
 @admin_and_not_paused
 async def c(message: types.Message):
-    await close(message)
+    await close_app(message)
 
 
 # Register a command handler to close browser
@@ -199,23 +194,20 @@ async def r_c(message: types.Message):
     await right_click(message)
 
 
-# Register a command handler to click at exact place
-# /move_to x y
+# /move_to | /move_to x y
 @dp.message_handler(commands=["move_to"])
 @admin_and_not_paused
-async def m_t(message: types.Message):
+async def m_to(message: types.Message):
     await move_to(message)
 
 
-# Register a command handler to scrolling
-# /scroll *num*
+# /scroll_page | /scroll_page *num*
 @dp.message_handler(commands=["scroll"])
 @admin_and_not_paused
 async def s_page(message: types.Message):
     await scroll_page(bot, message)
 
 
-# Register a command handler to reboot the computer
 # /reboot
 @dp.message_handler(commands=["reboot"])
 @admin_and_not_paused
@@ -223,8 +215,7 @@ async def r(message: types.Message):
     await reboot(message)
 
 
-# Register a command handler to power off the computer
-# /power_off | /power_off *int* - minutes
+# /power_off | /power_off *num*
 @dp.message_handler(commands=["power_off"])
 @admin_and_not_paused
 async def p_off(message: types.Message):

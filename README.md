@@ -49,6 +49,7 @@ This is a Telegram bot that allows you to control various functions on your PC, 
 - /screen: Take a screenshot of the current window.
 - /screen_framed: Take a framed screenshot of the current window.
 - /click <x> <y>: Simulate a click at the specified coordinates.
+- /right_click: Simulate a right click.
 - /double_click <x> <y>: Simulate a double click at the specified coordinates.
 - /move_to <x> <y>: Move the cursor to the specified coordinates.
 - /scroll <num>: Scroll the page up or down by the given amount.

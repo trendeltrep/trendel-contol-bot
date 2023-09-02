@@ -3,6 +3,7 @@ import platform
 import subprocess
 import pyautogui
 from aiogram import Bot, types
+from aiogram.types import InputFile
 from PIL import Image, ImageDraw, ImageFont
 
 SCREENSHOT_PATH = "screenshot.png"
@@ -170,3 +171,34 @@ async def power_off(message: types.Message):
                 print("Unsupported operating system")
         except subprocess.CalledProcessError as e:
             print(f"Error powering off: {e}")
+
+
+async def send_file(bot: Bot, message: types.Message):
+    file_path = message.text[len("/send_file") :].strip()
+    if os.path.exists(file_path):
+        await bot.send_document(message.chat.id, InputFile(file_path))
+    else:
+        await message.answer("File does not exist.")
+
+
+async def tree(message: types.Message):
+    dir_path = message.text[len("/tree") :].strip()
+    if os.path.exists(dir_path) and os.path.isdir(dir_path):
+        tree_str = generate_tree(dir_path)
+        await message.answer(tree_str)
+    else:
+        await message.answer("Directory does not exist.")
+
+
+def generate_tree(dir_path, padding=""):
+    tree_str = padding[:-1] + "+--" + os.path.basename(dir_path) + "/" + "\n"
+    padding = padding + " "
+
+    if os.path.isdir(dir_path):
+        for i, child in enumerate(sorted(os.listdir(dir_path))):
+            child_path = os.path.join(dir_path, child)
+            if os.path.isdir(child_path):
+                tree_str += generate_tree(child_path, padding + "|  ")
+            else:
+                tree_str += padding + "|-- " + child + "\n"
+    return tree_str

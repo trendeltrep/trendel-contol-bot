@@ -22,6 +22,8 @@ from pc import (
     take_screenshot,
     take_screenshot_framed,
     close_app,
+    send_file,
+    tree,
     click,
     double_click,
     right_click,
@@ -150,6 +152,20 @@ async def s_start(message: types.Message):
 @admin_and_not_paused
 async def s_close(message: types.Message):
     await spotify_close(message)
+
+
+# /send_file *path*
+@dp.message_handler(commands=["send_file"])
+@admin_and_not_paused
+async def s_file(message: types.Message):
+    await send_file(bot, message)
+
+
+# /tree *path*
+@dp.message_handler(commands=["tree"])
+@admin_and_not_paused
+async def t(message: types.Message):
+    await tree(message)
 
 
 # /screen

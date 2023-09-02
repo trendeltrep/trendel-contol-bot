@@ -2,6 +2,7 @@ import os
 import platform
 import subprocess
 import pyautogui
+import tempfile
 from aiogram import Bot, types
 from aiogram.types import InputFile
 from PIL import Image, ImageDraw, ImageFont
@@ -183,9 +184,22 @@ async def send_file(bot: Bot, message: types.Message):
 
 async def tree(message: types.Message):
     dir_path = message.text[len("/tree") :].strip()
+
+    # Use a raw string to preserve backslashes in the path
+
+    dir_path = rf"{dir_path}"
     if os.path.exists(dir_path) and os.path.isdir(dir_path):
         tree_str = generate_tree(dir_path)
-        await message.answer(tree_str)
+
+        # Save the tree representation to a temporary text file with a .txt extension
+        with tempfile.NamedTemporaryFile(
+            delete=False, mode="w", encoding="utf-8", suffix=".txt"
+        ) as temp_file:
+            temp_file.write(tree_str)
+
+        # Send the text file as a document
+        with open(temp_file.name, "rb") as document:
+            await message.answer_document(document)
     else:
         await message.answer("Directory does not exist.")
 
@@ -194,11 +208,20 @@ def generate_tree(dir_path, padding=""):
     tree_str = padding[:-1] + "+--" + os.path.basename(dir_path) + "/" + "\n"
     padding = padding + " "
 
-    if os.path.isdir(dir_path):
-        for i, child in enumerate(sorted(os.listdir(dir_path))):
-            child_path = os.path.join(dir_path, child)
-            if os.path.isdir(child_path):
-                tree_str += generate_tree(child_path, padding + "|  ")
-            else:
-                tree_str += padding + "|-- " + child + "\n"
+    try:
+        if os.path.isdir(dir_path):
+            for i, child in enumerate(sorted(os.listdir(dir_path))):
+                child_path = os.path.join(dir_path, child)
+                try:
+                    if os.path.isdir(child_path):
+                        tree_str += generate_tree(child_path, padding + "|  ")
+                    else:
+                        tree_str += padding + "|-- " + child + "\n"
+                except PermissionError as e:
+                    # Handle the PermissionError by skipping the directory/file
+                    tree_str += padding + "|-- " + f"PermissionError: {e}" + "\n"
+    except PermissionError as e:
+        # Handle the PermissionError for the root directory
+        tree_str = f"PermissionError: {e}" + "\n"
+
     return tree_str

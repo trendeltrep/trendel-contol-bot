@@ -189,7 +189,7 @@ async def tree(message: types.Message):
 
     dir_path = rf"{dir_path}"
     if os.path.exists(dir_path) and os.path.isdir(dir_path):
-        tree_str = generate_tree(dir_path)
+        tree_str = await generate_tree(dir_path)
 
         # Save the tree representation to a temporary text file with a .txt extension
         with tempfile.NamedTemporaryFile(
@@ -204,7 +204,7 @@ async def tree(message: types.Message):
         await message.answer("Directory does not exist.")
 
 
-def generate_tree(dir_path, padding=""):
+async def generate_tree(dir_path, padding=""):
     tree_str = padding[:-1] + "+--" + os.path.basename(dir_path) + "/" + "\n"
     padding = padding + " "
 
@@ -214,7 +214,7 @@ def generate_tree(dir_path, padding=""):
                 child_path = os.path.join(dir_path, child)
                 try:
                     if os.path.isdir(child_path):
-                        tree_str += generate_tree(child_path, padding + "|  ")
+                        tree_str += await generate_tree(child_path, padding + "|  ")
                     else:
                         tree_str += padding + "|-- " + child + "\n"
                 except PermissionError as e:

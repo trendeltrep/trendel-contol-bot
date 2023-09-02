@@ -4,7 +4,7 @@ from aiogram import types
 
 
 async def vsc_start(path: str, message: types.Message):
-    # Start Steam command handler.
+    # Start VSC command handler.
 
     try:
         await message.answer("Opening...")
@@ -15,6 +15,17 @@ async def vsc_start(path: str, message: types.Message):
 
 
 async def vsc_close(message: types.Message):
-    # Start Steam command handler.
-
-    await message.answer("vsc_close not done yet")
+    try:
+        await message.answer("Closing...")
+        if platform.system() == "Windows":
+            subprocess.run(["taskkill", "/F", "/IM", "Code.exe"])
+        elif platform.system() == "Darwin":
+            subprocess.run(["pkill", "-x", "Visual Studio Code"])
+        elif platform.system() == "Linux":
+            subprocess.run(["pkill", "code"])
+        else:
+            await message.answer("Unsupported operating system")
+            return
+        await message.answer("Done")
+    except Exception as e:
+        await message.answer(f"Error closing VSC: {e}")

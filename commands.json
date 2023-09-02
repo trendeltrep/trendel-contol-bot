@@ -3,6 +3,8 @@
   "help": "Display available commands and their usage.",
   "enable_bot": "Enable the bot (admin only).",
   "pause_bot": "Pause the bot (admin only).",
+  "vsc_start": "Open VSC.",
+  "vsc_close": "Close VSC.",
   "steam_start": "Open Steam.",
   "steam_close": "Close Steam.",
   "spotify_start": " Open Spotify.",

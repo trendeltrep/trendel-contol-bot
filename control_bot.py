@@ -6,6 +6,7 @@ from aiogram.utils import executor
 from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOAuth
 
+from vsc import vsc_start, vsc_close
 from loading import get_commands, get_config
 from steam import steam_start, steam_close
 from spotify import (
@@ -40,6 +41,7 @@ config = get_config()
 API_TOKEN = config["API_TOKEN"]
 PATH_TO_STEAM = config["PATH_TO_STEAM"]
 PATH_TO_CHROME = config["PATH_TO_CHROME"]
+PATH_TO_VSC = config["PATH_TO_VSC"]
 PATH_TO_SPOTIFY = config["PATH_TO_SPOTIFY"]
 ADMIN_ID = config["ADMIN_ID"]
 CLIENT_ID_SPOTIFY = config["CLIENT_ID_SPOTIFY"]
@@ -106,6 +108,20 @@ async def help(message: types.Message):
         msg += f"/{com} : {desc} \n"
     pin_msg = await message.answer(msg)
     await bot.pin_chat_message(message.chat.id, pin_msg.message_id)
+
+
+# /vsc_start
+@dp.message_handler(commands=["vsc_start"])
+@admin_and_not_paused
+async def vsc_s(message: types.Message):
+    await vsc_start(PATH_TO_VSC, message)
+
+
+# /vsc_close
+@dp.message_handler(commands=["vsc_close"])
+@admin_and_not_paused
+async def vsc_c(message: types.Message):
+    await vsc_close(message)
 
 
 # /steam_start

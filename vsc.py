@@ -4,8 +4,6 @@ from aiogram import types
 
 
 async def vsc_start(path: str, message: types.Message):
-    # Start VSC command handler.
-
     try:
         await message.answer("Opening...")
         subprocess.Popen([path])

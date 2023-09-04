@@ -1,3 +1,4 @@
+import datetime
 import logging
 import functools
 from aiogram import Bot, Dispatcher, types
@@ -81,6 +82,9 @@ async def send_unauthorized_message(message: types.Message):
 def admin_and_not_paused(func):
     @functools.wraps(func)
     async def wrapper(message: types.Message, *args, **kwargs):
+        logging.info(
+            f" {datetime.datetime.now()} - {func.__name__} | {message.from_user.username} : {message.from_user.id} | {message.text}"
+        )
         if not is_admin(message.from_user.id):
             await send_unauthorized_message(message)
         elif BOT_PAUSED:
@@ -94,7 +98,7 @@ def admin_and_not_paused(func):
 # Start handler
 @dp.message_handler(commands=["start"])
 @admin_and_not_paused
-async def cmd_start(message: types.Message):
+async def start(message: types.Message):
     """Start command handler."""
     await message.answer("Hello! I'm your bot. Send me a message!")
 
@@ -103,7 +107,7 @@ async def cmd_start(message: types.Message):
 # /help
 @dp.message_handler(commands=["help"])
 @admin_and_not_paused
-async def help(message: types.Message):
+async def send_commands(message: types.Message):
     """Start command handler."""
     msg = ""
     for com, desc in commands:
@@ -115,84 +119,84 @@ async def help(message: types.Message):
 # /vsc_start
 @dp.message_handler(commands=["vsc_start"])
 @admin_and_not_paused
-async def vsc_s(message: types.Message):
+async def pc_vsc_start(message: types.Message):
     await vsc_start(PATH_TO_VSC, message)
 
 
 # /vsc_close
 @dp.message_handler(commands=["vsc_close"])
 @admin_and_not_paused
-async def vsc_c(message: types.Message):
+async def pc_vsc_close(message: types.Message):
     await vsc_close(message)
 
 
 # /steam_start
 @dp.message_handler(commands=["steam_start"])
 @admin_and_not_paused
-async def s_start(message: types.Message):
+async def pc_steam_start(message: types.Message):
     await steam_start(PATH_TO_STEAM, message)
 
 
 # /steam_close
 @dp.message_handler(commands=["steam_close"])
 @admin_and_not_paused
-async def s_close(message: types.Message):
+async def pc_steam_close(message: types.Message):
     await steam_close(message)
 
 
 # /spotify_start
 @dp.message_handler(commands=["spotify_start"])
 @admin_and_not_paused
-async def s_start(message: types.Message):
+async def pc_spotify_close(message: types.Message):
     await spotify_start(PATH_TO_SPOTIFY, message)
 
 
 # /spotify_close
 @dp.message_handler(commands=["spotify_close"])
 @admin_and_not_paused
-async def s_close(message: types.Message):
+async def pc_spotify_close(message: types.Message):
     await spotify_close(message)
 
 
 # /send_file *path*
 @dp.message_handler(commands=["send_file"])
 @admin_and_not_paused
-async def s_file(message: types.Message):
+async def pc_send_file(message: types.Message):
     await send_file(bot, message)
 
 
 # /tree *path*
 @dp.message_handler(commands=["tree"])
 @admin_and_not_paused
-async def t(message: types.Message):
+async def pc_tree(message: types.Message):
     await tree(message)
 
 
 # /screen
 @dp.message_handler(commands=["screen"])
 @admin_and_not_paused
-async def screen(message: types.Message):
+async def pc_screen(message: types.Message):
     await take_screenshot(bot, message)
 
 
 # /screen_framed | /screen_framed *num*
 @dp.message_handler(commands=["screen_framed"])
 @admin_and_not_paused
-async def screen_framed(message: types.Message):
+async def pc_screen_f(message: types.Message):
     await take_screenshot_framed(bot, message)
 
 
 # /chrome *input*
 @dp.message_handler(commands=["chrome"])
 @admin_and_not_paused
-async def c_open(message: types.Message):
+async def pc_chrome_open(message: types.Message):
     await chrome_open(bot, PATH_TO_CHROME, message)
 
 
 # /close *any apps in lowercase*
 @dp.message_handler(commands=["close"])
 @admin_and_not_paused
-async def c(message: types.Message):
+async def pc_close(message: types.Message):
     await close_app(message)
 
 
@@ -200,7 +204,7 @@ async def c(message: types.Message):
 # /chrome_close
 @dp.message_handler(commands=["chrome_close"])
 @admin_and_not_paused
-async def c_close(message: types.Message):
+async def pc_chrome_close(message: types.Message):
     await chrome_close(message)
 
 
@@ -208,56 +212,56 @@ async def c_close(message: types.Message):
 # /click | /click x y
 @dp.message_handler(commands=["click"])
 @admin_and_not_paused
-async def c(message: types.Message):
+async def pc_lmb(message: types.Message):
     await click(message)
 
 
 # /double_click
 @dp.message_handler(commands=["double_click"])
 @admin_and_not_paused
-async def d_c(message: types.Message):
+async def pc_double_click(message: types.Message):
     await double_click(message)
 
 
 # /right_click
 @dp.message_handler(commands=["right_click"])
 @admin_and_not_paused
-async def r_c(message: types.Message):
+async def pc_rmb(message: types.Message):
     await right_click(message)
 
 
 # /move_to | /move_to x y
 @dp.message_handler(commands=["move_to"])
 @admin_and_not_paused
-async def m_to(message: types.Message):
+async def pc_move_to(message: types.Message):
     await move_to(message)
 
 
 # /scroll_page | /scroll_page *num*
 @dp.message_handler(commands=["scroll"])
 @admin_and_not_paused
-async def s_page(message: types.Message):
+async def pc_scroll(message: types.Message):
     await scroll_page(bot, message)
 
 
 # /reboot
 @dp.message_handler(commands=["reboot"])
 @admin_and_not_paused
-async def r(message: types.Message):
+async def pc_reboot(message: types.Message):
     await reboot(message)
 
 
 # /power_off | /power_off *num*
 @dp.message_handler(commands=["power_off"])
 @admin_and_not_paused
-async def p_off(message: types.Message):
+async def pc_power_off(message: types.Message):
     await power_off(message)
 
 
 # /search_music *query*
 @dp.message_handler(commands=["search_music"])
 @admin_and_not_paused
-async def s_music(message: types.Message):
+async def spotify_search(message: types.Message):
     query = message.text[len("/search_music") :].strip()
     tracks = await search_music(sp, query)
     response = "Search results:\n"
@@ -274,7 +278,7 @@ async def s_music(message: types.Message):
 # /play *track id from /search_music*
 @dp.message_handler(commands=["play_music"])
 @admin_and_not_paused
-async def play(message: types.Message):
+async def spotify_play(message: types.Message):
     command_args = message.text.split()
     if len(command_args) != 2:
         await message.answer("Usage: /play_music <track_uri>")
@@ -292,14 +296,14 @@ async def play(message: types.Message):
 # /pause_music
 @dp.message_handler(commands=["pause_music"])
 @admin_and_not_paused
-async def p(message: types.Message):
+async def spotify_pause_music(message: types.Message):
     await pause_music(sp, message)
 
 
 # /resume_music
 @dp.message_handler(commands=["resume_music"])
 @admin_and_not_paused
-async def r(message: types.Message):
+async def spotify_resume_music(message: types.Message):
     await resume_music(sp, message)
 
 
@@ -328,7 +332,7 @@ async def pause_bot(message: types.Message):
 # Register a text message handler
 @dp.message_handler(content_types=types.ContentTypes.TEXT)
 @admin_and_not_paused
-async def test(message: types.Message):
+async def send_msg(message: types.Message):
     await message.answer(message.from_user.id)
 
 

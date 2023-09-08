@@ -1,7 +1,7 @@
 import datetime
 import logging
 import functools
-import statics
+import statistic
 
 from aiogram import Bot, Dispatcher, types
 from aiogram.utils import executor
@@ -41,7 +41,10 @@ logging.basicConfig(level=logging.INFO)
 
 commands = get_commands().items()
 config = get_config()
-
+try:
+    data = statistic.load()
+except Exception as e:
+    logging.error(e)
 # Load configuration from config
 API_TOKEN = config["API_TOKEN"]
 PATH_TO_STEAM = config["PATH_TO_STEAM"]
@@ -103,6 +106,7 @@ def admin_and_not_paused(func):
 async def start(message: types.Message):
     """Start command handler."""
     await message.answer("Hello! I'm your bot. Send me a message!")
+    data["start"] += 1
 
 
 # Command handlers
@@ -116,6 +120,7 @@ async def send_commands(message: types.Message):
         msg += f"/{com} : {desc} \n"
     pin_msg = await message.answer(msg)
     await bot.pin_chat_message(message.chat.id, pin_msg.message_id)
+    data["help"] += 1
 
 
 # /vsc_start
@@ -123,6 +128,7 @@ async def send_commands(message: types.Message):
 @admin_and_not_paused
 async def pc_vsc_start(message: types.Message):
     await vsc_start(PATH_TO_VSC, message)
+    data["vsc_start"] += 1
 
 
 # /vsc_close
@@ -130,6 +136,7 @@ async def pc_vsc_start(message: types.Message):
 @admin_and_not_paused
 async def pc_vsc_close(message: types.Message):
     await vsc_close(message)
+    data["vsc_close"] += 1
 
 
 # /steam_start
@@ -137,6 +144,7 @@ async def pc_vsc_close(message: types.Message):
 @admin_and_not_paused
 async def pc_steam_start(message: types.Message):
     await steam_start(PATH_TO_STEAM, message)
+    data["steam_start"] += 1
 
 
 # /steam_close
@@ -144,6 +152,7 @@ async def pc_steam_start(message: types.Message):
 @admin_and_not_paused
 async def pc_steam_close(message: types.Message):
     await steam_close(message)
+    data["steam_close"] += 1
 
 
 # /spotify_start
@@ -151,6 +160,7 @@ async def pc_steam_close(message: types.Message):
 @admin_and_not_paused
 async def pc_spotify_close(message: types.Message):
     await spotify_start(PATH_TO_SPOTIFY, message)
+    data["spotify_start"] += 1
 
 
 # /spotify_close
@@ -158,6 +168,7 @@ async def pc_spotify_close(message: types.Message):
 @admin_and_not_paused
 async def pc_spotify_close(message: types.Message):
     await spotify_close(message)
+    data["spotify_close"] += 1
 
 
 # /send_file *path*
@@ -165,6 +176,7 @@ async def pc_spotify_close(message: types.Message):
 @admin_and_not_paused
 async def pc_send_file(message: types.Message):
     await send_file(bot, message)
+    data["send_file"] += 1
 
 
 # /tree *path*
@@ -172,6 +184,7 @@ async def pc_send_file(message: types.Message):
 @admin_and_not_paused
 async def pc_tree(message: types.Message):
     await tree(message)
+    data["tree"] += 1
 
 
 # /screen
@@ -179,6 +192,7 @@ async def pc_tree(message: types.Message):
 @admin_and_not_paused
 async def pc_screen(message: types.Message):
     await take_screenshot(bot, message)
+    data["screen"] += 1
 
 
 # /screen_framed | /screen_framed *num*
@@ -186,6 +200,7 @@ async def pc_screen(message: types.Message):
 @admin_and_not_paused
 async def pc_screen_f(message: types.Message):
     await take_screenshot_framed(bot, message)
+    data["screen_framed"] += 1
 
 
 # /chrome *input*
@@ -193,6 +208,7 @@ async def pc_screen_f(message: types.Message):
 @admin_and_not_paused
 async def pc_chrome_open(message: types.Message):
     await chrome_open(bot, PATH_TO_CHROME, message)
+    data["chrome"] += 1
 
 
 # /close *any apps in lowercase*
@@ -200,6 +216,7 @@ async def pc_chrome_open(message: types.Message):
 @admin_and_not_paused
 async def pc_close(message: types.Message):
     await close_app(message)
+    data["close"] += 1
 
 
 # Register a command handler to close browser
@@ -208,6 +225,7 @@ async def pc_close(message: types.Message):
 @admin_and_not_paused
 async def pc_chrome_close(message: types.Message):
     await chrome_close(message)
+    data["chrome_close"] += 1
 
 
 # Register a command handler to click at exact place
@@ -216,6 +234,7 @@ async def pc_chrome_close(message: types.Message):
 @admin_and_not_paused
 async def pc_lmb(message: types.Message):
     await click(message)
+    data["click"] += 1
 
 
 # /double_click
@@ -223,6 +242,7 @@ async def pc_lmb(message: types.Message):
 @admin_and_not_paused
 async def pc_double_click(message: types.Message):
     await double_click(message)
+    data["double_click"] += 1
 
 
 # /right_click
@@ -230,6 +250,7 @@ async def pc_double_click(message: types.Message):
 @admin_and_not_paused
 async def pc_rmb(message: types.Message):
     await right_click(message)
+    data["right_click"] += 1
 
 
 # /move_to | /move_to x y
@@ -237,6 +258,7 @@ async def pc_rmb(message: types.Message):
 @admin_and_not_paused
 async def pc_move_to(message: types.Message):
     await move_to(message)
+    data["move_to"] += 1
 
 
 # /scroll_page | /scroll_page *num*
@@ -244,6 +266,7 @@ async def pc_move_to(message: types.Message):
 @admin_and_not_paused
 async def pc_scroll(message: types.Message):
     await scroll_page(bot, message)
+    data["scroll"] += 1
 
 
 # /reboot
@@ -251,6 +274,7 @@ async def pc_scroll(message: types.Message):
 @admin_and_not_paused
 async def pc_reboot(message: types.Message):
     await reboot(message)
+    data["reboot"] += 1
 
 
 # /power_off | /power_off *num*
@@ -258,6 +282,7 @@ async def pc_reboot(message: types.Message):
 @admin_and_not_paused
 async def pc_power_off(message: types.Message):
     await power_off(message)
+    data["power_off"] += 1
 
 
 # /search_music *query*
@@ -275,6 +300,7 @@ async def spotify_search(message: types.Message):
         uri = track.get("uri", "No URI")
         response += f"{i}. {track_name} - {artists} : {uri}\n"
     await message.answer(response)
+    data["search_music"] += 1
 
 
 # /play *track id from /search_music*
@@ -293,6 +319,7 @@ async def spotify_play(message: types.Message):
         await message.answer("Playback started.")
     else:
         await message.answer("Failed to start playback.")
+    data["play_music"] += 1
 
 
 # /pause_music
@@ -300,6 +327,7 @@ async def spotify_play(message: types.Message):
 @admin_and_not_paused
 async def spotify_pause_music(message: types.Message):
     await pause_music(sp, message)
+    data["pause_music"] += 1
 
 
 # /resume_music
@@ -307,6 +335,15 @@ async def spotify_pause_music(message: types.Message):
 @admin_and_not_paused
 async def spotify_resume_music(message: types.Message):
     await resume_music(sp, message)
+    data["resume_music"] += 1
+
+
+# /statics
+@dp.message_handler(commands=["statistic"])
+@admin_and_not_paused
+async def show_statistic(message: types.Message):
+    await statistic.send_statistic(data.items(), message)
+    data["statistic"] += 1
 
 
 # /enable_bot
@@ -318,6 +355,7 @@ async def enable_bot(message: types.Message):
     global BOT_PAUSED
     BOT_PAUSED = False
     await message.answer("Bot enabled")
+    data["enable_bot"] += 1
 
 
 # /pause_bot
@@ -329,6 +367,7 @@ async def pause_bot(message: types.Message):
         await send_unauthorized_message(message)
         return
     await message.answer("Bot paused")
+    data["pause_bot"] += 1
 
 
 # Register a text message handler
@@ -341,6 +380,6 @@ async def send_msg(message: types.Message):
 if __name__ == "__main__":
     # Initialize a flag to track whether the bot is paused or not
     BOT_PAUSED = False
-    statics.load()
     # Start the bot
     executor.start_polling(dp, skip_updates=True)
+    statistic.save_data(data)

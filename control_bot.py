@@ -1,6 +1,8 @@
 import datetime
 import logging
 import functools
+import statics
+
 from aiogram import Bot, Dispatcher, types
 from aiogram.utils import executor
 
@@ -339,6 +341,6 @@ async def send_msg(message: types.Message):
 if __name__ == "__main__":
     # Initialize a flag to track whether the bot is paused or not
     BOT_PAUSED = False
-
+    statics.load()
     # Start the bot
     executor.start_polling(dp, skip_updates=True)
